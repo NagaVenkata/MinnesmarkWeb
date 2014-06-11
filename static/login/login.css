@@ -1,0 +1,43 @@
+.center-wrapper{
+    text-align: center;
+    margin: 100px 0 0 0;
+}
+.center-wrapper form{
+    width: 515px;
+    margin:auto;
+}
+.center-wrapper form input{
+    position: relative;
+    padding:14px 20px;
+    border: 2px solid #cccccc;
+    border-top: none;
+    font-size: 9pt;
+    width: 220px;
+}
+
+.center-wrapper form label{
+    position: absolute;
+    top: 18px;
+    left: 0;
+    width: 140px;
+    text-align: right;
+}
+.center-wrapper form fieldset.tag{
+    position: relative;
+    border: none;
+    margin:0;
+    padding: 0;
+}
+.center-wrapper form fieldset.tag .login{
+    position: absolute;
+    top: 4px;
+    right: 155px;
+}
+
+.center-wrapper form fieldset.tag:first-child input{
+    border-top: 2px solid #cccccc;
+
+}
+.reg-btn{
+    font-size:16pt;
+}

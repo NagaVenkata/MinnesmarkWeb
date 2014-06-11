@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Editor{% endblock %}
+
+{% block metadata %}
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+
+    <link rel="stylesheet"
+          href="/static/editor/editor.css"/>
+
+    <script type="text/javascript" src="/static/editor/javascript/editor.js"></script>
+    <link href="/static/editor/css/no-theme/jquery-ui-1.10.4.custom.css" rel="stylesheet">
+    <script src="/static/editor/javascript/jquery-ui-1.10.4.custom.min.js"></script>
+    <script type="text/javascript" src="/static/editor/javascript/general.js"></script>
+
+    <script type="text/javascript" src="/static/javascript/setActiveChoice.js"></script>
+
+{% endblock %}
+
+
+{% block content %}
+    <div class="row clearfix">
+
+        <div class="column third">
+
+            {% include 'editor/editormenu.html' %}
+            {% include 'editor/route_menu.html' %}
+
+        </div>
+        <div class="column two-thirds">
+
+
+            <div id="map-wrapper">
+                <div class="rowfix clearfix">
+
+                    <div class="top-wrapper">
+                        <div class="btn-block">
+                            <button class="btn blue round"> <span class="typcn typcn-th-menu"> </span></button>
+                            <p class="label-bottom">Göm menyn</p>
+                        </div>
+                        <div class="btn-block saveroutename">
+
+                            <button class="btn green round "> <span class="typcn typcn-cloud-storage"> </span></button>
+                            <p class="label-bottom">Spara på kontot</p>
+                        </div>
+                        <h2 class="text-center">1. Bestäm namn och startmedia</h2>
+                    </div>
+                </div>
+                <div class="rowfixfull clearfix">
+                    {% if msg != None %}
+                        <h3 class="error">{{ msg }}</h3>
+                    {% endif %}
+                    <div class="tour-name-wrapper">
+                        <label for="tour-name">Namn:</label>
+                        <input id="tour-name" type="text" name="tour-name" value="{{ cur_route_name }}"/>
+                    </div>
+                    <div class="startmedia-wrapper">
+                        <h3>Startmedia:</h3>
+                        <p class="small-text">Dra för att ändra ordning.</p>
+                        <ul class="media-files" id="addLi">
+                            {% for m in start_media %}
+                                <li class="clearfix">
+                                    <span class="typcn typcn-arrow-unsorted"></span>
+
+                                    <button class="media-opt btn round"><span class="typcn typcn-info-large"></span></button>
+                                    <p>{{ m.name }}</p>
+                                    <form action="" method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="delmedia" value="{{ m.id }}">
+                                        <button class="btn round orange minus"><span class="typcn typcn-minus"></span></button>
+                                    </form>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                        <div class="add-media clearfix">
+                            <button class="btn round orange"><span class="typcn typcn-plus"></span></button>
+
+                            <p class="mini-text">Lägg till media</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    <div class="fadeBG"></div>
+    <div class="upload-file">
+        <h2>Ladda upp fil</h2>
+        <form action="" method="post" enctype="multipart/form-data">
+           {% csrf_token %}  
+            <input id="id_media_file" type="file" name="media_file">
+            <button class="upload-btn btn orange large"><span class="typcn typcn-upload"></span> Ladda upp </button>
+
+        </form>
+        <button class="upload-abort btn">Avbryt</button>
+    </div>
+    </div>
+{% endblock %}

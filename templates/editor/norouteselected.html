@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% block title %}Editor{% endblock %}
+
+{% block metadata %}
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+
+    <link rel="stylesheet"
+          href="/static/editor/editor.css"/>
+
+    <script type="text/javascript" src="/static/editor/javascript/editor.js"></script>
+    <script type="text/javascript" src="/static/editor/javascript/general.js"></script>
+
+{% endblock %}
+
+
+{% block content %}
+    <div class="row clearfix">
+
+        <div class="column third">
+
+            {% include 'editor/editormenu.html' %}
+            {% include 'editor/route_menu.html' %}
+
+        </div>
+        <div class="column two-thirds">
+
+
+            <div id="map-wrapper">
+                <div class="rowfix clearfix">
+
+
+                </div>
+                <div class="rowfixfull clearfix">
+
+                    <div class="startmedia-wrapper">
+                        <h3 class="text-center gray">Välj en rundtur till vänster eller skapa en ny.</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="fadeBG"></div>
+        <div class="upload-file">
+            <h2>Ladda upp fil</h2>
+            <form action="" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input id="id_media_file" type="file" name="media_file">
+                <button class="upload-btn btn orange large"><span class="typcn typcn-upload"></span> Ladda upp </button>
+
+            </form>
+            <button class="upload-abort btn">Avbryt</button>
+        </div>
+    </div>
+{% endblock %}

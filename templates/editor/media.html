@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}Editor{% endblock %}
+
+{% block metadata %}
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+
+    <link rel="stylesheet"
+          href="/static/editor/editor.css"/>
+
+    <script type="text/javascript" src="/static/editor/javascript/editor.js"></script>
+    <link href="/static/editor/css/no-theme/jquery-ui-1.10.4.custom.css" rel="stylesheet">
+    <script src="/static/editor/javascript/jquery-ui-1.10.4.custom.min.js"></script>
+    <script type="text/javascript" src="/static/editor/javascript/general.js"></script>
+
+    <script type="text/javascript" src="/static/javascript/setActiveChoice.js"></script>
+
+{% endblock %}
+
+
+{% block content %}
+    <div class="row clearfix">
+
+        <div class="column third">
+
+            {% include 'editor/editormenu.html' %}
+            {% include 'editor/route_menu.html' %}
+
+
+        </div>
+        <div class="column two-thirds">
+
+
+            <div id="map-wrapper">
+                <div class="rowfix clearfix">
+
+                    <div class="top-wrapper">
+                        <div class="btn-block">
+                            <button class="btn blue round"> <span class="typcn typcn-th-menu"> </span></button>
+                            <p class="label-bottom">Göm menyn</p>
+                        </div>
+                        <div class="btn-block">
+                            <button class="btn green round"> <span class="typcn typcn-cloud-storage"> </span></button>
+                            <p class="label-bottom">Spara på kontot</p>
+                        </div>
+                        <h2 class="text-center">3. Lägg till media</h2>
+                    </div>
+                </div>
+                <div class="rowfixfull clearfix">
+                    <div class="startmedia-wrapper">
+                        <h3>Media på stationer:</h3>
+                        <ul class="stations-list">
+                            {% for s in stations %}
+                            <li class="clearfix">
+                                <p class="small-text">Station {{ s.number }}</p>
+				<a href="/editor/media/{{ cur_route.id }}/station/{{ s.id }}"><span class="typcn typcn-chevron-right"></span></a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                        <h3>Media på AR-markörer:</h3>
+                        <ul class="stations-list">
+                            <li class="clearfix">
+                                <p class="small-text">Markör 1</p>
+                                <a href="/editor/media/marker/"><span class="typcn typcn-chevron-right"></span></a>
+                            </li>
+                            <li class="clearfix">
+                                <p class="small-text">Markör 2</p>
+                                <a href="/editor/media/marker/"><span class="typcn typcn-chevron-right"></span></a>
+                            </li>
+                            <li class="clearfix">
+                                <p class="small-text">Markör 3</p>
+                                <a href="/editor/media/marker/"><span class="typcn typcn-chevron-right"></span></a>
+                            </li>
+                            <li class="clearfix">
+                                <p class="small-text">Markör 4</p>
+                                <a href="/editor/media/marker/"><span class="typcn typcn-chevron-right"></span></a>
+                            </li>
+                            <li class="clearfix">
+                                <p class="small-text">Markör 5</p>
+                                <a href="/editor/media/marker/"><span class="typcn typcn-chevron-right"></span></a>
+                            </li>
+                            <li class="clearfix">
+                                <p class="small-text">Markör 6</p>
+                                <a href="/editor/media/marker/"><span class="typcn typcn-chevron-right"></span></a>
+                            </li>
+                            <li class="clearfix">
+                                <p class="small-text">Markör 7</p>
+                                <a href="/editor/media/marker/"><span class="typcn typcn-chevron-right"></span></a>
+                            </li>
+                            <li class="clearfix">
+                                <p class="small-text">Markör 8</p>
+                                <a href="/editor/media/marker/"><span class="typcn typcn-chevron-right"></span></a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

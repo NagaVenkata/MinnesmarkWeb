@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block metadata %}
+<script type="text/javascript" src="/static/javascript/clearLocalStorage.js"></script>
+{% endblock %}
+
+
+{% block content %}
+<p>{% trans "Du är nu registrerad!" %}</p>
+<p><a href="/accounts/login">Gå tillbaka till Login</a></p>
+{% endblock %}

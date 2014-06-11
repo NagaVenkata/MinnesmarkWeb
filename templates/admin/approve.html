@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block metadata %}
+    <link rel="stylesheet" href="/static/admin/admin.css" />
+{% endblock %}
+
+{% block content %}
+    <div class="row clearfix">
+
+        <div class="column full">
+
+            <div class="center-wrapper">
+                <h2 class="title">Godkänn användare</h2>
+
+                <ul>
+                    {% for user in users.all %}
+                        <li>
+                            <div class="user-info">
+                                <p class="username"> <span class="italic">Användarnamn:</span>{{user.username}}</p>
+                                <p><span class="italic">Email:</span> {{user.email}}</p>
+                                <p><span class="italic">Förnamn:</span> {{user.first_name}}</p>
+                                <p><span class="italic">Efternamn:</span> {{user.last_name}}</p>
+                            </div>
+                            <form action="" method="post">
+                                {% csrf_token %}
+
+                                <button class="btn full square"><span class="typcn typcn-tick"></span></button>
+                                <input type="hidden" name="userid" value="{{user.id}}">
+                            </form>
+                            <div class="clearfix"></div>
+                        </li>
+                    {% endfor %}
+                </ul>
+
+            </div>
+        </div>
+    </div>
+
+
+
+{% endblock %}
+

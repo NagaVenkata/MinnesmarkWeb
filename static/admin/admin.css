@@ -1,0 +1,30 @@
+.center-wrapper{
+    text-align: center;
+    margin: 100px 0 0 0;
+}
+.center-wrapper ul{
+    list-style: none;
+    width: 300px;
+    margin: auto;
+    padding: 0;
+}
+.center-wrapper ul li{
+    background:#f7f6f3;
+    border:1px solid #d6d5d2;
+    margin: 20px 0;
+    padding: 10px;
+}
+.center-wrapper ul li p{
+    font-size: 10pt;
+    text-align: left;
+
+}
+.center-wrapper ul li span.italic{
+    font-style:italic;
+    font-weight: bold;
+    width: 110px;
+    display: block;
+}
+.center-wrapper ul form button span{
+    font-size: 18pt;
+}

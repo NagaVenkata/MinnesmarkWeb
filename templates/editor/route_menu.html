@@ -1,0 +1,44 @@
+<div class="tour">
+    <ul class="tour-list">
+        {% for r in routes %}
+            {% if r.id|slugify == cur_route %}
+                <li class="active">
+            {% else %}
+                <li>
+            {% endif %}
+
+                <span class="typcn typcn-chevron-right see-more"></span>
+                <h2 class="see-more">{{ r.name }}</h2>
+                <p class="small-text">
+                    {% if r.publish %}
+                       Publicerad
+                    {% else %}
+                       Opublicerad
+                    {% endif %}
+
+                </p>
+                <ul class="tour-menu">
+                    <li class="clearfix">
+                        <p>1. Bestäm namn och startmedia</p>
+                        <a href="/editor/general/{{ r.id }}" class="editor-btn" id="general"><span class="typcn typcn-chevron-right"></span></a>
+
+                    </li>
+                    <li class="clearfix">
+                        <p>2. Lägg till stationer på kartan</p>
+                        <a href="/editor/stations/{{ r.id }}" class="editor-btn" id="stations"><span class="typcn typcn-chevron-right"></span></a>
+
+                    </li>
+                    <li class="clearfix">
+                        <p>3. Lägg till media</p>
+                        <a href="/editor/media/{{ r.id }}" class="editor-btn" id="media"><span class="typcn typcn-chevron-right"></span></a>
+
+                    </li>
+                    <li class="clearfix">
+                        <p>4. Publicera, skriv ut och fördigställ</p>
+                        <a href="/editor/publish/{{ r.id }}" class="editor-btn" id="publish"><span class="typcn typcn-chevron-right"></span></a>
+                    </li>
+                </ul>
+            </li>
+        {% endfor %}
+    </ul>
+</div>
