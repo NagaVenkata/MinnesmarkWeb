@@ -15,7 +15,8 @@ define(function () {
         swingPoints,
         stations,
         radiusDistance,
-        editorSaved;
+        editorSaved,
+        mapIsSet;
 
     my.isSaved = function(){
         return editorSaved;
@@ -43,10 +44,11 @@ define(function () {
             browserSupportFlag = true;
             navigator.geolocation.getCurrentPosition(function(position) {
                 // Set initial location to geographical location
-            	
-                initialLocation = new google.maps.LatLng(position.coords.latitude,position.coords.longitude);
-                //console.log("Found location." + initialLocation);
-                map.setCenter(initialLocation);
+            	if(!mapIsSet){
+                    initialLocation = new google.maps.LatLng(position.coords.latitude,position.coords.longitude);
+                    //console.log("Found location." + initialLocation);
+                    map.setCenter(initialLocation);
+		}
             }, function() {
                 handleNoGeolocation(browserSupportFlag);
             });
@@ -68,7 +70,9 @@ define(function () {
     };
 
     my.initializeEditor = function(){
+	console.log("bfhfhksrebvbgvkdr");
         mapLoaded = false;
+	mapIsSet = false;
         browserSupportFlag =  new Boolean();
         initialLocation = new google.maps.LatLng(59.321693,17.886825); // Drottningholm, Stockholm
         resetSearchSystem();
@@ -101,15 +105,30 @@ define(function () {
         map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
 
         geoLocation();
+
         createSearchField();
-
+	
         polyLine = createPolyLine();
-
+	newMapPosition();
         optionsWindow = new google.maps.InfoWindow({
             content: ""
         });
         mapLoaded = true;
     };
+
+    newMapPosition = function() {
+	/*for(var i = 0; i < load_polylines.length;i++ ){
+            for(var j = 0; j < load_stations.length; j++){
+                if(load_stations[j].index == load_polylines[i].index){
+                    if(i == load_stations.length-1){
+                    	map.setCenter(new google.maps.LatLng(load_polylines[i].latitude,load_polylines[i].longitude));
+                    }
+                }
+            }
+        }*/
+	console.log(stations.length);
+	//console.log(points.length);
+    }
 
     createSearchField = function(){
 
@@ -474,7 +493,6 @@ define(function () {
     };
 
     my.loadRoute = function(route_info){
-    	
     	//stations only contains index and number no latitude and logitude
     	//points contains index and latitude and longitude
         var load_stations = route_info["stations"];
@@ -491,11 +509,12 @@ define(function () {
                     loadStation(linePos,load_stations[j].index);
                     
                     //Set Current map position of last station
-                    if(i == load_stations.length-1){
+                    if(j+1 == load_stations.length){
                     	//alert("routre data "+load_stations[i].lat()+"  "+load_stations[i].lng());
                         //map.setCenter(new google.maps.LatLng(load_stations[i].latitude,load_stations[i].longitude));
                     	//map.setCenter(new google.maps.LatLng(linePos.lat(),linePos.lng()));
                     	map.setCenter(new google.maps.LatLng(load_polylines[i].latitude,load_polylines[i].longitude));
+			mapIsSet = true;
                     }
                 }
             }
