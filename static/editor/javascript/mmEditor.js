@@ -32,7 +32,7 @@ define(function () {
         return stations;
     };
     my.getPath = function(){
-        return polyLine.getPath().getArray();
+    	return polyLine.getPath().getArray();
     };
 
     geoLocation = function(){
@@ -498,10 +498,20 @@ define(function () {
         var load_stations = route_info["stations"];
         var load_polylines = route_info["points"];
         
+        //alert("Entered ");
         
-
-        for(var i = 0; i < load_polylines.length;i++ ){
+        
+        
+        /*for(var i = 0; i < load_polylines.length;i++ ){
             var linePos = new google.maps.LatLng(load_polylines[i].latitude,load_polylines[i].longitude);
+            alert("polylines  "+load_polylines[i].latitude+"  "+load_polylines[i].longitude+"  "+load_polylines[i].index);
+        }*/    
+        console.log(load_polylines.length);
+        for(var i = 0; i < load_polylines.length;i++ ){
+        	//console.log(load_polylines[i].latitude);
+        	var linePos = new google.maps.LatLng(load_polylines[i].latitude,load_polylines[i].longitude);
+        	//alert("index "+linePos+"  "+load_polylines[i].index);
+            //alert("stations "+load_polylines[i].latitude+"  "+load_polylines[i].longitude);
             for(var j = 0; j < load_stations.length; j++){
                 if(load_stations[j].index == load_polylines[i].index){
                 	
@@ -513,12 +523,17 @@ define(function () {
                     	//alert("routre data "+load_stations[i].lat()+"  "+load_stations[i].lng());
                         //map.setCenter(new google.maps.LatLng(load_stations[i].latitude,load_stations[i].longitude));
                     	//map.setCenter(new google.maps.LatLng(linePos.lat(),linePos.lng()));
+                    	//alert("lat "+load_polylines[i].latitude+" lang  "+load_polylines[i].longitude);
                     	map.setCenter(new google.maps.LatLng(load_polylines[i].latitude,load_polylines[i].longitude));
 			mapIsSet = true;
                     }
                 }
             }
+            //console.log("line pos "+linePos);
+            //alert(linePos+"  "+load_polylines.length+"  "+i);
+            //alert("array index  "+i);
             polyLine.getPath().setAt(load_polylines[i].index,linePos);
+            
         }
 
         //Remove loading Window

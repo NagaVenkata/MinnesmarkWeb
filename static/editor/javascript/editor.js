@@ -46,7 +46,12 @@ $('document').ready(function(){
 
     //function is called when clicked on add media button
     $('.add-media').on('click',function(){
-       openFileUpload($(this));
+       alert($('.add-media').attr("name"));	
+       var media_type = $('.add-media').attr("name");
+       if(media_type==null)
+    	   alert("choose media type for uploaded file");
+       else
+           openFileUpload($(this));
     });
     
     //function called when clicked on publish a trial
@@ -55,6 +60,10 @@ $('document').ready(function(){
     	publishJsonFile($(this));
     	$("input[name='publish']").prop('disabled',true);	
      });
+    
+   
+    
+       
 });
 
 // Opens the window with publish options
@@ -64,6 +73,8 @@ function openFileUpload(e){
     var $upload = $('.upload-file');
     var $btnAbort = $('.upload-abort');
     var $btn = $('.upload-btn');
+    
+    
 
     $btnAbort.on('click',function(){
         $bg.fadeOut();
@@ -76,7 +87,8 @@ function openFileUpload(e){
         });
 
     })
-
+    
+   
     var top = ($(window).height()/2) - ($upload.outerHeight()/2);
     var left = ($(window).width()/2) - ($upload.outerWidth()/2);
     $upload.css({top:top,left:left});
@@ -146,7 +158,9 @@ function uploadSelectedFile(){
             }
         }
     });
-
+    console.log("entered "+$( '#media_file' ).value);
+    console.log($( '#media_file' )[0].files[0]);
+    console.log("entered1");
 
     var formData = new FormData();
     formData.append( 'file', $( '#media_file' )[0].files[0] );
@@ -168,6 +182,8 @@ function uploadSelectedFile(){
         }
     });
 }
+
+
 
 function publishSelectedTrail(){
 	
@@ -247,6 +263,24 @@ function createMediaOptionsWindow(e){
         $mediabox.remove();
         $bg.remove();
     })
+    
+    
+    
+    $btnFinished.on('click',function(){
+    	
+    	$mediabox.remove();
+	    $bg.remove();
+	    
+	    if(($radio1).val() == "panorama")
+	    	type=1;
+	    if(($radio2).val() == "camera_bg")
+	    	type=2;
+	    if(($radio3).val() == "fullscreen")
+	    	type=3;
+	    	
+    	addImageType(e.attr('name'),type);
+    	
+    })
 
     $header.append($p);
     $topbar.append($btnAbort);
@@ -270,4 +304,37 @@ function createMediaOptionsWindow(e){
     var marginLeft = 48
     var marginTop = -6
     $mediabox.css({left: e.offset().left+marginLeft+"px" , top: e.offset().top + marginTop + "px"});
+    
+    
+}
+
+function addImageType(button_id,type){
+	
+	var csrftoken = getCookie('csrftoken');
+    $.ajaxSetup({
+        crossDomain: false, // obviates need for sameOrigin test
+        beforeSend: function(xhr, settings) {
+            if (!csrfSafeMethod(settings.type)) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                alert(csrftoken);
+            }
+        }
+    });
+    
+    
+	
+	var request = $.ajax({
+        url: "/editor/media/marker/2/1?id="+button_id+"&type="+type,
+        type: "GET",
+        //data: "id="+$('.media-opt').attr("name")+"&type="+type,
+        xhr: function() {  // custom xhr
+            myXhr = $.ajaxSettings.xhr();
+            return myXhr;
+        },
+        success: function(res){
+            console.log("SUCCESS");
+            alert("Hi");
+            //console.log(res);
+        }
+    });
 }

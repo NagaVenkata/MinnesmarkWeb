@@ -24,6 +24,13 @@ h3{
     font-size: 11pt;
     color: #393939;
 }
+
+.marker-small-text{
+	left:25px;
+	font-size: 11pt;
+    color: #393939;
+}
+
 .mini-text{
     font-size: 9pt;
     color: #222222;

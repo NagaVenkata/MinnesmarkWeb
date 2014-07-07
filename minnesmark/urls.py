@@ -45,8 +45,8 @@ urlpatterns = patterns('',
     url(r'^editor/media/(?P<route_id>\d+)/station/$', render_page_addMedia),
     url(r'^editor/publish/(?P<route_id>\d+)/$', render_page_publish),
     
-    
-    url(r'^editor/media/marker/$',render_page_marker),
+    #url for marker page
+    url(r'^editor/media/marker/(?P<route_id>\d+)/(?P<marker_id>\d+)/$',render_page_marker),
 
     #url for database
     url(r'^editor/saveRouteDB', save_route_to_database),

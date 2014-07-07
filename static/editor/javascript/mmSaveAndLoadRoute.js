@@ -66,6 +66,65 @@ define(function(){
 
         return paths_data;
     }
+    
+    getPathData1 = function(stations,path){
+        paths_data = []
+        stationIndex = []
+        
+        for(var i=0;i<stations.length;i++) {
+        	for(var j = 0; j < path.length; j++) {
+        		if(parseInt(stations[i].pathIndex)==parseInt(j)) {
+        	       //alert(parseInt(stations[i].pathIndex));
+        	       var p_data = {
+        	                "latitude": path[j].lat(),
+        	                "longitude": path[j].lng(),
+        	                "index": parseInt(j),
+        	                "radius":10.0,
+        	                "shouldDisplayOnCompass":false,
+        	                "swingPoint":false
+        	            };
+        	     
+        	            paths_data.push(p_data);
+        	       stationIndex.push(parseInt(j));
+        		}   
+        	}
+        }
+        
+        var j=0;
+        
+        for(var i = 0; i < path.length; i++){
+           
+        	if(stationIndex[j]==parseInt(i)) {
+        		
+        		j++;
+        	}
+        	else {
+        		
+        		 var p_data = {
+     	                "latitude": path[i].lat(),
+     	                "longitude": path[i].lng(),
+     	                "index": parseInt(i),
+     	                "radius":10.0,
+     	                "shouldDisplayOnCompass":false,
+     	                "swingPoint":true
+     	            };
+      	            paths_data.push(p_data);
+        	} 		
+        }
+        
+        
+        
+        /*for(var i = 0; i < path.length; i++){
+            var p_data = {
+                "latitude": path[i].lat(),
+                "longitude": path[i].lng(),
+                "index": parseInt(i)
+            };
+            paths_data.push(p_data);
+        }*/
+
+        return paths_data;
+    }
 
     my.saveToDatabase = function(stations,path){
         var csrftoken = getCookie('csrftoken');
@@ -80,9 +139,14 @@ define(function(){
         });
 
         var route_data = {};
+        var route_data1 = {};
         route_data["route_id"] = parseInt(getIDfromURL());
+        //alert(stations+"  "+stations.length);
+        
         route_data["stations"] = getStationsData(stations);
-        route_data["points"] = getPathData(path);
+        route_data["points"] = getPathData1(stations,path);
+        //route_data["points"] = getPathData(path);
+        //getPathData1(station,path);
         console.log(JSON.stringify(route_data));
         var request = $.ajax({
             url: "/editor/saveRouteDB",

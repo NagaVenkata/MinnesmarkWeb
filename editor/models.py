@@ -30,23 +30,53 @@ class Polyline(models.Model):
     index = models.IntegerField()
     latitude = models.DecimalField(max_digits=30, decimal_places=25)
     longitude = models.DecimalField(max_digits=30, decimal_places=25)
-
+    radius = models.DecimalField(max_digits=4, decimal_places=2)
+    shouldDisplayOnCompass = models.BooleanField()
+    swingPoint = models.BooleanField()     
+    
+    print(radius)       
+    
     def as_json(self):
         return dict(
             index=self.index,
             latitude=float(self.latitude),
-            longitude=float(self.longitude)
+            longitude=float(self.longitude),
+            radius = float(self.radius),
+            shouldDisplayOnCompass = bool(self.shouldDisplayOnCompass),
+            swingPoint = bool(self.swingPoint)
         )
+
+class Marker(models.Model):
+    route = models.ForeignKey(Route, null=True)
+    index = models.IntegerField()
+    name = models.CharField(max_length=255)
+    markerName = models.CharField(max_length=255)
+    type = models.CharField(max_length=255)
+    markerSize = models.IntegerField()
+    angle = models.DecimalField(max_digits=4, decimal_places=2)
+    collectItem = models.BooleanField()
+    
+    def as_json(self):
+        return dict(
+            markerName=self.markerName,
+            markerSize=self.markerSize,
+            collectItem = self.collectItem
+      )
+
 
 # Media tables
 class Media(models.Model):
     route = models.ForeignKey(Route)
     station = models.ForeignKey(Station, null=True)
+    marker = models.ForeignKey(Marker,null=True)
     filename = models.CharField(max_length=40)
     filepath = models.CharField(max_length=256)
+    nextEventName = models.CharField(max_length=256,null=True)
+    eventName = models.CharField(max_length=256,null=True)
     size = models.IntegerField()
     treasure = models.BooleanField(default=False)
     order = models.IntegerField()
+    type = models.CharField(max_length=50,null=True)
 
     PANORAMA = 1
     CAMERA_BG = 2

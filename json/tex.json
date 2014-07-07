@@ -1,0 +1,146 @@
+[
+    {
+        "attributes": {
+            "ledTitle": "Sp\u00e5r1"
+        }, 
+        "name": "Title", 
+        "type": "title"
+    }, 
+    {
+        "attributes": {
+            "numRegions": 2
+        }, 
+        "name": "NumberOfRegions", 
+        "type": "NumberOfRegions"
+    }, 
+    {
+        "action": {
+            "enter-region": [
+                "disableStation1Compass", 
+                "stationEnterAudio"
+            ]
+        }, 
+        "attributes": {
+            "index": 0, 
+            "latitude": 58.397800399693296, 
+            "longitude": 15.574488468011168, 
+            "radius": 10.0, 
+            "shouldDisplayOnCompass": false, 
+            "swingPoint": false
+        }, 
+        "name": "station1", 
+        "type": "region"
+    }, 
+    {
+        "action": {
+            "enter-region": [
+                "disableStation1Compass", 
+                "stationEnterAudio"
+            ]
+        }, 
+        "attributes": {
+            "index": 3, 
+            "latitude": 58.39929022727814, 
+            "longitude": 15.573968119462279, 
+            "radius": 10.0, 
+            "shouldDisplayOnCompass": false, 
+            "swingPoint": false
+        }, 
+        "name": "station2", 
+        "type": "region"
+    }, 
+    {
+        "action": {
+            "enter-region": [
+                "disableStation1Compass", 
+                "stationEnterAudio"
+            ]
+        }, 
+        "attributes": {
+            "index": 1, 
+            "latitude": 58.398210811311586, 
+            "longitude": 15.572981066544799, 
+            "radius": 10.0, 
+            "shouldDisplayOnCompass": true, 
+            "swingPoint": true
+        }, 
+        "name": "station1_swingpoint1", 
+        "type": "region"
+    }, 
+    {
+        "action": {
+            "enter-region": [
+                "disableStation1Compass", 
+                "stationEnterAudio"
+            ]
+        }, 
+        "attributes": {
+            "index": 2, 
+            "latitude": 58.39893323659315, 
+            "longitude": 15.573557741483, 
+            "radius": 10.0, 
+            "shouldDisplayOnCompass": true, 
+            "swingPoint": true
+        }, 
+        "name": "station1_swingpoint2", 
+        "type": "region"
+    }, 
+    {
+        "action": {
+            "marker-found": [
+                "MarkerUnDetect", 
+                "marker1_Image1"
+            ]
+        }, 
+        "attributes": {
+            "collectItem": false, 
+            "markerName": "patt.marker1", 
+            "markerSize": 12484
+        }, 
+        "name": "Marker1", 
+        "type": "marker"
+    }, 
+    {
+        "action": {
+            "image-disappeared": [
+                "marker1_Image2"
+            ]
+        }, 
+        "attributes": {
+            "collectItem": false, 
+            "imageName": "search.png", 
+            "imageSize": 992
+        }, 
+        "name": "marker1_Image1", 
+        "type": "image"
+    }, 
+    {
+        "action": {
+            "image-disappeared": [
+                "marker1_Image3"
+            ]
+        }, 
+        "attributes": {
+            "collectItem": false, 
+            "imageName": "upload.png", 
+            "imageSize": 583
+        }, 
+        "name": "marker1_Image2", 
+        "type": "image"
+    }, 
+    {
+        "action": {
+            "image-disappeared": [
+                "MarkerDetect", 
+                "Done"
+            ]
+        }, 
+        "attributes": {
+            "collectItem": false, 
+            "imageName": "camera.png", 
+            "imageSize": 28634
+        }, 
+        "name": "marker1_Image3", 
+        "type": "image"
+    }
+]
