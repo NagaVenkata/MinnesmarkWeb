@@ -156,6 +156,7 @@ def render_page_marker(request,route_id,marker_id):
             save_marker_to_database(request,route_id,marker_id)
         if(request.method == 'POST'):
             try:
+                print(request.POST['delmedia'])
                 #Runs if you want to delete a media in startmedia
                 success = delete_media(request.POST['delmedia'], request.user.id,route_id,0,marker_id)
             except:
@@ -171,6 +172,9 @@ def render_page_marker(request,route_id,marker_id):
         print(marker_media)
         
         media_option = None
+        
+        if(len(marker_media) == 1):
+            media_option = marker_media[0]['options']
         
         if(len(marker_media)>1):
             print(marker_media[len(marker_media)-1]['options'])

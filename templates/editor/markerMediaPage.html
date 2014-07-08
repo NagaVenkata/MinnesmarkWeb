@@ -95,7 +95,7 @@
                                     
                                     <form action="" method="post"> 
                                         {% csrf_token %}
-                                        <input type="hidden" id="media" name="delmedia" value="{{ m.id }}">
+                                        <input type="hidden" name="delmedia" value="{{ m.id }}">
                                         <button class="btn round orange minus"><span class="typcn typcn-minus"></span></button>
                                    </form>  
                                 </li>

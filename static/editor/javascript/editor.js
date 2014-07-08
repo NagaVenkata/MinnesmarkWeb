@@ -48,7 +48,8 @@ $('document').ready(function(){
     $('.add-media').on('click',function(){
        //alert($('.add-media').attr("name"));	
        var media_type = $('.add-media').attr("name");
-       if(media_type==null)
+       alert(media_type);
+       if(media_type=="None")
     	   alert("choose media type for uploaded file");
        else
            openFileUpload($(this));
