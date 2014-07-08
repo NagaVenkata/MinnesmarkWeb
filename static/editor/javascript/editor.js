@@ -46,7 +46,7 @@ $('document').ready(function(){
 
     //function is called when clicked on add media button
     $('.add-media').on('click',function(){
-       alert($('.add-media').attr("name"));	
+       //alert($('.add-media').attr("name"));	
        var media_type = $('.add-media').attr("name");
        if(media_type==null)
     	   alert("choose media type for uploaded file");
@@ -252,8 +252,22 @@ function createMediaOptionsWindow(e){
     var $option3 = $('<div>',{class:"option"});
     var $label1 = $('<label>',{class:"small-text",text:"Panorama"});
     var $radio1 = $('<input>',{type:"radio",name:"options",value:"panorama"});
-    var $label2 = $('<label>',{class:"small-text",text:"Visas med kamerabild i bakgrunden"});
-    var $radio2 = $('<input>',{type:"radio",name:"options",value:"camera_bg"});
+    var $label2;
+    var $radio2;
+    var elements = $('.media-opt');
+    
+    if((elements.length==1) &&(e.attr('name') == $('.media-opt')[0].name)) {
+    
+    	$label2 = $('<label>',{class:"small-text",text:"Visas med kamerabild i bakgrunden"});
+        $radio2 = $('<input>',{type:"radio",name:"options",value:"camera_bg"});
+    }
+    else {
+    	
+    	var $label2 = $('<label>',{class:"small-text",text:"Visas med kamerabild i bakgrunden",style:"color:#aaa"});
+        var $radio2 = $('<input>',{type:"radio",name:"options",value:"camera_bg",disabled:'disabled'});
+    }
+    //var $label2 = $('<label>',{class:"small-text",text:"Visas med kamerabild i bakgrunden"});
+    //var $radio2 = $('<input>',{type:"radio",name:"options",value:"camera_bg"});
     var $label3 = $('<label>',{class:"small-text",text:"Visas i helskärm"});
     var $radio3 = $('<input>',{type:"radio",name:"options",value:"fullscreen"});
 
@@ -264,7 +278,19 @@ function createMediaOptionsWindow(e){
         $bg.remove();
     })
     
-    
+  /*  if(e.attr('name') == $('.media-opt')[0].name) {
+    	
+    	
+        $option2.disabled = false;
+ 
+    }
+    else {
+    	console.log($radio2);
+    	alert($radio2.name);
+    	$("input[value='camera_bg']").prop('disabled',true);
+    	$option2.disabled = true;
+    	$radio2.disabled = true;
+    } */
     
     $btnFinished.on('click',function(){
     	
@@ -297,6 +323,10 @@ function createMediaOptionsWindow(e){
     $optionsMenu.append($option2)
     $optionsMenu.append($option3)
     $mediabox.append($optionsMenu);
+    
+    var nodes = $option2;
+    
+    $radio2.disabled = true;
 
     $bg.appendTo('body').hide().fadeIn(1000);
     $mediabox.appendTo('body');
@@ -333,7 +363,7 @@ function addImageType(button_id,type){
         },
         success: function(res){
             console.log("SUCCESS");
-            alert("Hi");
+            //alert("Hi");
             //console.log(res);
         }
     });

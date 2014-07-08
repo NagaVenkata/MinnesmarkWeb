@@ -68,10 +68,10 @@ def render_page_general(request,route_id):
                 #otherwise you want to upload a media
                 userName = request.user.username
                 userId = request.user.id
-                print(request.user.username)
-                print(request.user.id)
-                print(request.FILES['media_file'])
-                print(route_id)
+                #print(request.user.username)
+                #print(request.user.id)
+                #print(request.FILES['media_file'])
+                #print(route_id)
                 success, media_id = handle_upload(request,request.FILES['media_file'],route_id,0,0
                                                   )
                 print(media_id)
@@ -169,14 +169,20 @@ def render_page_marker(request,route_id,marker_id):
             marker_media.append(m.as_json())
             
         print(marker_media)
-        print(marker_media[len(marker_media)-1]['options'])
+        
+        media_option = None
+        
+        if(len(marker_media)>1):
+            print(marker_media[len(marker_media)-1]['options'])
+            media_option = marker_media[len(marker_media)-1]['options']
+        
         #print(marker_media)
         return render_to_response('editor/markerMediaPage.html',
                                   {'marker_media':marker_media,
                                    'routes': routes,
                                    'cur_route':route,
                                    'marker_id':markerName,
-                                   'prev_media_type':marker_media[1]['options']
+                                   'prev_media_type':media_option
                                    },
                               context_instance=RequestContext(request))
     else:
