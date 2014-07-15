@@ -5,6 +5,7 @@
 <head>
     <script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
     <script type="text/javascript" src="/static/javascript/require.js"></script>
+    <script type="text/javascript" src="/static/editor/javascript/headline.js"></script>
 
     <link href='http://fonts.googleapis.com/css?family=Nobile:400,400italic,700,700italic' rel='stylesheet' type='text/css'>
 
@@ -24,29 +25,6 @@
 <body>
 <div class="container">
     {% block content %}{% endblock %}
-
-
-    <!-- <header>
-        <a href="/">
-            <img id="logotype" alt="Minnesmark" src="/static/images/logo.jpg" />
-            <h1>Minnesmark</h1>
-        </a>
-        <nav>
-            <ul>
-                {% block header %}
-                    {% if user.is_superuser %}
-                        <li><a href="{% url 'index' %}">{% trans "Hem" %}</a></li>
-                        <li><a href="/admin/">{% trans "Admin Panel" %}</a></li>
-                        <li><a href="/admin/approve">{% trans "Godkänn Konton" %}</a></li>
-                        <li><a href="/editor/">{% trans "Editor" %}</a></li>
-                    {% endif %}
-                    {% if user.is_authenticated %}
-                        <li><a href="/accounts/logout">{% trans "Logga ut" %}</a></li>
-                    {% endif %}
-                {% endblock %}
-            </ul>
-        </nav>
-    </header> -->
 
 
     <footer>

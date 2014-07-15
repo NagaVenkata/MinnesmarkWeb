@@ -16,6 +16,9 @@ $('document').ready(function(){
             If Not has Active class, Hide all tour-menus
             and display the clicked one
          */
+
+	document.location.href = "general/" + $(this)[0].id;
+
         if(!$(this).hasClass('active')){
             $(".tour-list li").each(function() {
                 $(this).removeClass('active');
@@ -63,8 +66,17 @@ $('document').ready(function(){
      });
     
    
-    
-       
+    $('#hideMenu').on('click', function(){
+	if (document.getElementById("contentDiv").className == "column two-thirds") {
+	    document.getElementById("menuDiv").style.display = 'none';
+	    document.getElementById("contentDiv").className = "column half";
+	}
+	else {
+	    //document.getElementById("menuDiv").className = "column third";
+	    document.getElementById("menuDiv").style.display = 'block';
+	    document.getElementById("contentDiv").className = "column two-thirds";
+	}
+    });
 });
 
 // Opens the window with publish options

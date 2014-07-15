@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "editor/editorbase.html" %}
 
 {% block title %}Editor{% endblock %}
 
@@ -25,45 +25,20 @@
 
 
 {% block content %}
+    
+    <div class="rowfix clearfix">
+      <div class="btn-block btn-add-margin station">
+        <button class="btn green round"> <span class="typcn typcn-plus"> </span></button>
+        <p class="add-label ">Lägg till station</p>
 
-    <div class="row clearfix">
-
-        <div class="column third">
-
-            {% include 'editor/editormenu.html' %}
-            {% include 'editor/route_menu.html' %}
-        </div>
-        <div class="column two-thirds">
-
-
-            <div id="map-wrapper">
-                <div class="rowfix clearfix">
-
-                    <div class="top-wrapper">
-                        <div class="btn-block">
-                            <button class="btn blue round"> <span class="typcn typcn-th-menu"> </span></button>
-                            <p class="label-bottom">Göm menyn</p>
-                        </div>
-                        <div class="btn-block">
-                            <button class="saveRoute btn green round"> <span class="typcn typcn-cloud-storage"> </span></button>
-                            <p class="label-bottom">Spara på kontot</p>
-                        </div>
-                        <h2 class="text-center">2. Lägg till stationer på kartan (max 6)</h2>
-                    </div>
-                    <div class="btn-block btn-add-margin station">
-                        <button class="btn green round"> <span class="typcn typcn-plus"> </span></button>
-                        <p class="add-label ">Lägg till station</p>
-
-                    </div>
-                </div>
-                <div class="rowfixfull clearfix">
-                    <input id="pac-input" class="controls" type="text" placeholder="Search Box">
-                    <div id="map-canvas"></div>
-                </div>
-            </div>
-        </div>
+      </div>
     </div>
+    <div class="rowfixfull clearfix">
+      <input id="pac-input" class="controls" type="text" placeholder="Search Box">
+      <div id="map-canvas"></div>
+    </div>
+
     <div class="fadeBGShow">
-        <img src="/static/images/loading.gif" alt="Laddar Karta">
+      <img src="/static/images/loading.gif" alt="Laddar Karta">
     </div>
-{% endblock %}
+    {% endblock %}
