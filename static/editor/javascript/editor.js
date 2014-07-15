@@ -17,9 +17,8 @@ $('document').ready(function(){
             and display the clicked one
          */
 
-	document.location.href = "general/" + $(this)[0].id;
-
         if(!$(this).hasClass('active')){
+	    document.location.pathname = "editor/general/" + $(this)[0].id;
             $(".tour-list li").each(function() {
                 $(this).removeClass('active');
                 $(this).find('.typcn-chevron-right').removeClass('rotate90');

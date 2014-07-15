@@ -1,6 +1,6 @@
 $('document').ready(function(){
     var url = document.URL;
-    var text;
+    var text = "Välj eller skapa ny rundvandring till vänster";
     if (url.indexOf("general") >= 0) {
 	text = "1. Bestäm namn och startmedia";
     }
