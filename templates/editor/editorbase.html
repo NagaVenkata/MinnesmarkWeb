@@ -1,0 +1,47 @@
+{% load i18n %}
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+    <script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+    <script type="text/javascript" src="/static/javascript/require.js"></script>
+    <script type="text/javascript" src="/static/editor/javascript/headline.js"></script>
+
+    <link href='http://fonts.googleapis.com/css?family=Nobile:400,400italic,700,700italic' rel='stylesheet' type='text/css'>
+
+    <link rel="stylesheet" href="/static/css/normalize.css" />
+    <link rel="stylesheet" href="/static/css/responsive.css" />
+    <link rel="stylesheet" href="/static/css/styles.css" />
+    <link rel="stylesheet" href="/static/fonts/typicons.min.css" />
+    {% block metadata %}
+
+    {% endblock %}
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <meta charset="utf-8"/>
+    <title>{% block title %}Minnesmark{% endblock %}</title>
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="row clearfix">
+        <div class="column third">
+          {% include 'editor/editormenu.html' %}
+          {% include 'editor/route_menu.html' %}
+        </div>
+        <div class="column two-thirds">
+          <div id="map-wrapper">
+	    {% include 'editor/headline.html' %}
+	    {% block content %}{% endblock %}
+	  </div>
+	</div>
+      </div>
+      <footer>
+        {% block footer %}
+        {% endblock %}
+      </footer>
+    </div>
+
+  </body>
+
+</html>
