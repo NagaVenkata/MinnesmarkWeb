@@ -101,7 +101,6 @@ $('document').ready(function(){
 	}
     });
 });
-<<<<<<< HEAD
 
 function addmedia() {
 	
@@ -112,10 +111,10 @@ function addmedia() {
     
     for(var i=0;i<media.length;i++) {
     	
-    	var option = media[i].value
+    	var option = media[i].value;
     	
     	if(option=="None")
-    		option=0
+    		option=0;
     		
     	
     	 var marker_id = {
@@ -173,8 +172,6 @@ function addmedia() {
      });
 	
 }
-=======
->>>>>>> FETCH_HEAD
 
 // Opens the window with publish options
 function openFileUpload(e){
