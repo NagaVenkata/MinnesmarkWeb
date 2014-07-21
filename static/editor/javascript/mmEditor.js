@@ -507,9 +507,24 @@ define(function () {
             alert("polylines  "+load_polylines[i].latitude+"  "+load_polylines[i].longitude+"  "+load_polylines[i].index);
         }*/    
         console.log(load_polylines.length);
+        
+        
+        console.log("after "+polyLine.getPath().length);
+        
+        polyLine = createPolyLine();
+        
+        
+        for(var i = 0; i < load_polylines.length;i++ ) {
+        
+        	 var linePos = new google.maps.LatLng(load_polylines[0].latitude,load_polylines[0].longitude);
+             polyLine.getPath().push(linePos);
+        }    
+        
         for(var i = 0; i < load_polylines.length;i++ ){
-        	//console.log(load_polylines[i].latitude);
+        	console.log("lat lan "+load_polylines[i].latitude+"  "+load_polylines[i].longitude);
         	var linePos = new google.maps.LatLng(load_polylines[i].latitude,load_polylines[i].longitude);
+        	
+        	console.log(linePos);
         	//alert("index "+linePos+"  "+load_polylines[i].index);
             //alert("stations "+load_polylines[i].latitude+"  "+load_polylines[i].longitude);
             for(var j = 0; j < load_stations.length; j++){
@@ -517,6 +532,9 @@ define(function () {
                 	
                 	//alert("stations "+load_stations[j].index+"  "+linePos.lat()+"  "+linePos.lng());
                     loadStation(linePos,load_stations[j].index);
+                    console.log("value of j"+j);
+                    
+                    console.log("polyline length in station "+polyLine.getPath().length);
                     
                     //Set Current map position of last station
                     if(j+1 == load_stations.length){
@@ -525,14 +543,19 @@ define(function () {
                     	//map.setCenter(new google.maps.LatLng(linePos.lat(),linePos.lng()));
                     	//alert("lat "+load_polylines[i].latitude+" lang  "+load_polylines[i].longitude);
                     	map.setCenter(new google.maps.LatLng(load_polylines[i].latitude,load_polylines[i].longitude));
-			mapIsSet = true;
+			            mapIsSet = true;
                     }
                 }
             }
             //console.log("line pos "+linePos);
             //alert(linePos+"  "+load_polylines.length+"  "+i);
             //alert("array index  "+i);
-            polyLine.getPath().setAt(load_polylines[i].index,linePos);
+        	
+        	//linePos = new google.maps.LatLng(load_polylines[i].latitude,load_polylines[i].longitude);
+        	console.log("polyline length "+polyLine.getPath().length+" "+i+"  "+load_polylines[i].index);
+        	polyLine.getPath().setAt(load_polylines[i].index,linePos);
+        	console.log("polyline length after"+polyLine.getPath().length+" "+i);
+        	
             
         }
 

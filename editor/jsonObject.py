@@ -145,12 +145,27 @@ class MediaEvent:
         
         self.name = media_object.eventName
         self.type = media_object.type
+        self.collectItem = media_object.treasure
         self.attributes = self.media_attributes()
+        
+        
+        action = None
         if(self.media.type == "image"):
             if(self.media.nextEventName!=None):
                 action = {u"image-disappeared":[media_object.nextEventName]}
             else:
                 action = {u"image-disappeared":[u"MarkerDetect",u"Done"]}
+        if(self.media.type == "audio"):
+            if(self.media.nextEventName!=None):
+                action = {u"audio-finished-playing":[media_object.nextEventName]}
+            else:
+                action = {u"audio-finished-playing":[u"MarkerDetect",u"Done"]}
+        if(self.media.type == "video"):
+            if(self.media.nextEventName!=None):
+                action = {u"video-finished-playing":[media_object.nextEventName]}
+            else:
+                action = {u"video-disappeared":[u"MarkerDetect",u"Done"]}
+                
         self.actions = action
                 
     def media_attributes(self):
@@ -158,7 +173,7 @@ class MediaEvent:
         return dict(
                     imageName = self.media.filename,
                     imageSize = self.media.size,
-                    collectItem = False)
+                    collectItem = self.collectItem)
     
     def as_json(self):
         return dict(
@@ -166,3 +181,18 @@ class MediaEvent:
                     type = self.type,
                     attributes = self.attributes,
                     action = self.actions)
+
+
+class Marker_Media:
+    def __init__(self,name):
+        self.markerName = name
+        self.markersMedia=[]
+
+    def setMarkerMedia(self,markerMedia):
+        self.markersMedia.append(markerMedia)
+    
+    def getMarkerName(self):
+        return self.markerName
+    
+    def getMarkerMedia(self):
+        return self.markersMedia

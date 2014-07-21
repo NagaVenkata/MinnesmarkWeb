@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "editor/editorbase.html" %}
 
 {% block title %}Editor{% endblock %}
 
@@ -19,102 +19,73 @@
 
 
 {% block content %}
-    <div class="row clearfix">
-
-        <div class="column third">
-
-            {% include 'editor/editormenu.html' %}
-            {% include 'editor/route_menu.html' %}
-
-
-        </div>
-        <div class="column two-thirds">
-
-
-            <div id="map-wrapper">
-                <div class="rowfix clearfix">
-
-                    <div class="top-wrapper">
-                        <div class="btn-block">
-                            <button class="btn blue round"> <span class="typcn typcn-th-menu"> </span></button>
-                            <p class="label-bottom">Göm menyn</p>
-                        </div>
-                        <div class="btn-block">
-                            <button class="btn green round"> <span class="typcn typcn-cloud-storage"> </span></button>
-                            <p class="label-bottom">Spara på kontot</p>
-                        </div>
-                        <h2 class="text-center">3. Lägg till media</h2>
-                    </div>
-                </div>
-                <div class="rowfixfull clearfix">
-                    <div class="startmedia-wrapper">
-                        <h3>Media på stationer:</h3>
-                        <ul class="stations-list">
-                            {% for s in stations %}
-                            <li class="clearfix">
-                                <p class="small-text">Station {{ s.number }}</p>
-				<a href="/editor/media/{{ cur_route.id }}/station/{{ s.id }}"><span class="typcn typcn-chevron-right"></span></a>
-                            </li>
-                            {% endfor %}
-                        </ul>
-                        <h3>Media på AR-markörer:</h3>
-                        <ul class="stations-list">
-                            <li class="clearfix">
-                                
-                                <div style="float:left;"><img src="/static/globalmarkers/pattern1.png" width=50 height =50 /></div>
-                                <div style="float:left; margin-left:10px;"><p class="marker-small-text">Markör 1</p></div>
-                                <div style="clear:both"></div>
-                                <a href="/editor/media/marker/{{ cur_route.id }}/1"><span class="typcn typcn-chevron-right"></span></a>
-                                
-                            </li>
-                            <li class="clearfix">
-                                <div style="float:left;"><img src="/static/globalmarkers/pattern2.png" width=50 height =50 /></div>
-                                <div style="float:left; margin-left:10px;"><p class="marker-small-text">Markör 2</p></div>
-                                <div style="clear:both"></div>
-                                <a href="/editor/media/marker/{{ cur_route.id }}/2"><span class="typcn typcn-chevron-right"></span></a>
-                                
-                            </li>
-                            <li class="clearfix">
-                                <div style="float:left;"><img src="/static/globalmarkers/pattern2.png" width=50 height =50 /></div>
-                                <div style="float:left; margin-left:10px;"><p class="marker-small-text">Markör 3</p></div>
-                                <div style="clear:both"></div>
-                                <a href="/editor/media/marker/{{ cur_route.id }}/3"><span class="typcn typcn-chevron-right"></span></a>
-                                
-                            </li>
-                            <li class="clearfix">
-                                <div style="float:left;"><img src="/static/globalmarkers/pattern4.png" width=50 height = 50 /></div>
-                                <div style="float:left; margin:10px;"><p class="small-text">Markör 4</p></div>
-                                <div style="clear:both"></div>
-                                <a href="/editor/media/marker/{{ cur_route.id }}/4"><span class="typcn typcn-chevron-right"></span></a>
-                            </li>
-                            <li class="clearfix">
-                                <div style="float:left;"><img src="/static/globalmarkers/pattern5.png" width=50 height = 50 /></div>
-                                <div style="float:left; margin:10px;"><p class="small-text">Markör 5</p></div>
-                                <div style="clear:both"></div>
-                                <a href="/editor/media/marker/{{ cur_route.id }}/5"><span class="typcn typcn-chevron-right"></span></a>
-                            </li>
-                            <li class="clearfix">
-                                <div style="float:left;"><img src="/static/globalmarkers/pattern6.png" width=50 height = 50 /></div>
-                                <div style="float:left; margin:10px;"><p class="small-text">Markör 6</p></div>
-                                <div style="clear:both"></div>
-                                <a href="/editor/media/marker/{{ cur_route.id }}/6"><span class="typcn typcn-chevron-right"></span></a>
-                            </li>
-                            <li class="clearfix">
-                                <div style="float:left;"><img src="/static/globalmarkers/pattern7.png" width=50 height = 50 /></div>
-                                <div style="float:left; margin:10px;"><p class="small-text">Markör 7</p></div>
-                                <div style="clear:both"></div>
-                                <a href="/editor/media/marker/{{ cur_route.id }}/7"><span class="typcn typcn-chevron-right"></span></a>
-                            </li>
-                            <li class="clearfix">
-                                <div style="float:left;"><img src="/static/globalmarkers/pattern8.png" width=50 height = 50 /></div>
-                                <div style="float:left; margin:10px;"><p class="small-text">Markör 8</p></div>
-                                <div style="clear:both"></div>
-                                <a href="/editor/media/marker/{{ cur_route.id }}/8"><span class="typcn typcn-chevron-right"></span></a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <div class="rowfixfull clearfix">
+      <div class="startmedia-wrapper">
+        <h3>Media på stationer:</h3>
+        <ul class="stations-list">
+          {% for s in stations %}
+          <li class="clearfix">
+            <p class="small-text">Station {{ s.number }}</p>
+	    <a href="/editor/media/{{ cur_route.id }}/station/{{ s.id }}"><span class="typcn typcn-chevron-right"></span></a>
+          </li>
+          {% endfor %}
+        </ul>
+        <h3>Media på AR-markörer:</h3>
+        <ul class="stations-list">
+          <li class="clearfix">
+            
+            <div style="float:left;"><img src="/static/globalmarkers/pattern1.png" width=50 height =50 /></div>
+            <div style="float:left; margin-left:10px;"><p class="marker-small-text">Markör 1</p></div>
+            <div style="clear:both"></div>
+            <a href="/editor/media/marker/{{ cur_route.id }}/1"><span class="typcn typcn-chevron-right"></span></a>
+            
+          </li>
+          <li class="clearfix">
+            <div style="float:left;"><img src="/static/globalmarkers/pattern2.png" width=50 height =50 /></div>
+            <div style="float:left; margin-left:10px;"><p class="marker-small-text">Markör 2</p></div>
+            <div style="clear:both"></div>
+            <a href="/editor/media/marker/{{ cur_route.id }}/2"><span class="typcn typcn-chevron-right"></span></a>
+            
+          </li>
+          <li class="clearfix">
+            <div style="float:left;"><img src="/static/globalmarkers/pattern2.png" width=50 height =50 /></div>
+            <div style="float:left; margin-left:10px;"><p class="marker-small-text">Markör 3</p></div>
+            <div style="clear:both"></div>
+            <a href="/editor/media/marker/{{ cur_route.id }}/3"><span class="typcn typcn-chevron-right"></span></a>
+            
+          </li>
+          <li class="clearfix">
+            <div style="float:left;"><img src="/static/globalmarkers/pattern4.png" width=50 height = 50 /></div>
+            <div style="float:left; margin:10px;"><p class="small-text">Markör 4</p></div>
+            <div style="clear:both"></div>
+            <a href="/editor/media/marker/{{ cur_route.id }}/4"><span class="typcn typcn-chevron-right"></span></a>
+          </li>
+          <li class="clearfix">
+            <div style="float:left;"><img src="/static/globalmarkers/pattern5.png" width=50 height = 50 /></div>
+            <div style="float:left; margin:10px;"><p class="small-text">Markör 5</p></div>
+            <div style="clear:both"></div>
+            <a href="/editor/media/marker/{{ cur_route.id }}/5"><span class="typcn typcn-chevron-right"></span></a>
+          </li>
+          <li class="clearfix">
+            <div style="float:left;"><img src="/static/globalmarkers/pattern6.png" width=50 height = 50 /></div>
+            <div style="float:left; margin:10px;"><p class="small-text">Markör 6</p></div>
+            <div style="clear:both"></div>
+            <a href="/editor/media/marker/{{ cur_route.id }}/6"><span class="typcn typcn-chevron-right"></span></a>
+          </li>
+          <li class="clearfix">
+            <div style="float:left;"><img src="/static/globalmarkers/pattern7.png" width=50 height = 50 /></div>
+            <div style="float:left; margin:10px;"><p class="small-text">Markör 7</p></div>
+            <div style="clear:both"></div>
+            <a href="/editor/media/marker/{{ cur_route.id }}/7"><span class="typcn typcn-chevron-right"></span></a>
+          </li>
+          <li class="clearfix">
+            <div style="float:left;"><img src="/static/globalmarkers/pattern8.png" width=50 height = 50 /></div>
+            <div style="float:left; margin:10px;"><p class="small-text">Markör 8</p></div>
+            <div style="clear:both"></div>
+            <a href="/editor/media/marker/{{ cur_route.id }}/8"><span class="typcn typcn-chevron-right"></span></a>
+          </li>
+        </ul>
+      </div>
     </div>
+</div>
 {% endblock %}

@@ -268,20 +268,21 @@ ul.stations-list li a{
     text-align: right;
     padding: 0 10px;
 }
-ul.startmedia-list,
+ul.startmedia-list,ul.markersmedia-list,
 ul.media-list
 {
     list-style: none;
     padding:0;
     margin:0;
 }
-ul.startmedia-list li,
+ul.startmedia-list li,ul.markersmedia-list li,
 ul.media-list li{
     background-color:white;
     padding: 10px 20px;
     border-bottom: 2px solid #d6d5d2;
 }
 ul.startmedia-list li input[type="checkbox"],
+ul.markersmedia-list li input[type="checkbox"],
 ul.media-list li input[type="checkbox"],
 .publish-wrapper .publish-tour input[type="checkbox"]{
     font-size: 50pt;
@@ -291,7 +292,7 @@ ul.media-list li input[type="checkbox"],
     float:left;
     margin-top:10px;
 }
-ul.startmedia-list li p,
+ul.startmedia-list li p,ul.markersmedia-list li p,
 ul.media-list li p{
     float:left;
     padding-left:15px;

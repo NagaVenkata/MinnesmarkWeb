@@ -2,9 +2,9 @@
     <ul class="tour-list">
         {% for r in routes %}
             {% if r.id|slugify == cur_route %}
-                <li class="active">
+                <li class="active" id="{{ r.id }}">
             {% else %}
-                <li>
+                <li id="{{ r.id }}">
             {% endif %}
 
                 <span class="typcn typcn-chevron-right see-more"></span>
@@ -17,7 +17,7 @@
                     {% endif %}
 
                 </p>
-                <ul class="tour-menu">
+                <ul class="tour-menu" id="" + r>
                     <li class="clearfix">
                         <p>1. Bestäm namn och startmedia</p>
                         <a href="/editor/general/{{ r.id }}" class="editor-btn" id="general"><span class="typcn typcn-chevron-right"></span></a>

@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <html lang="en">
 
-<head>
+  <head>
     <script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
     <script type="text/javascript" src="/static/javascript/require.js"></script>
     <script type="text/javascript" src="/static/editor/javascript/headline.js"></script>
@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="/static/css/normalize.css" />
     <link rel="stylesheet" href="/static/css/responsive.css" />
     <link rel="stylesheet" href="/static/css/styles.css" />
-    <link rel='stylesheet' href='/static/fonts/typicons.min.css' />
+    <link rel="stylesheet" href="/static/fonts/typicons.min.css" />
     {% block metadata %}
 
     {% endblock %}
@@ -20,19 +20,28 @@
 
     <meta charset="utf-8"/>
     <title>{% block title %}Minnesmark{% endblock %}</title>
-</head>
+  </head>
 
-<body>
-<div class="container">
-    {% block content %}{% endblock %}
-
-
-    <footer>
+  <body>
+    <div class="container">
+      <div class="row clearfix">
+        <div class="column third">
+          {% include 'editor/editormenu.html' %}
+          {% include 'editor/route_menu.html' %}
+        </div>
+        <div class="column two-thirds">
+          <div id="map-wrapper">
+	    {% include 'editor/headline.html' %}
+	    {% block content %}{% endblock %}
+	  </div>
+	</div>
+      </div>
+      <footer>
         {% block footer %}
         {% endblock %}
-    </footer>
-</div>
+      </footer>
+    </div>
 
-</body>
+  </body>
 
 </html>

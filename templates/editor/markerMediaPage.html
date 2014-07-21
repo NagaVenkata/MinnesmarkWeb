@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "editor/editorbase.html" %}
 
 {% block title %}Editor{% endblock %}
 
@@ -18,31 +18,16 @@
 
 
 {% block content %}
-    <div class="row clearfix">
 
-        <div class="column third">
+    <div class="rowfix clearfix">
 
-            <div class="menu">
-                <h1>Rundor</h1>
-                <div class="menu-btns">
-                    <div class="btn-block">
-                        <button class="btn green round"> <span class="typcn typcn-document-add"> </span></button>
-                        <p class="label-bottom">Ny runda</p>
-                    </div>
-                    <div class="btn-block">
-                        <button class="btn blue round"> <span class="typcn typcn-cog"> </span></button>
-                        <p class="label-bottom">Inställningar</p>
-                    </div>
-                    <div class="btn-block">
-                        <a href="/accounts/logout"><button class="btn blue round"> <span class="typcn typcn-power"> </span></button></a>
-                        <p class="label-bottom">Logga ut</p>
-                    </div>
-                </div>
-            </div>
-            {% include 'editor/route_menu.html' %}
-
-
+      <div class="top-wrapper">
+        <div class="btn-block">
+          <button class="btn blue round"> <span class="typcn typcn-th-menu"> </span></button>
+          <p class="label-bottom">Göm menyn</p>
         </div>
+<<<<<<< HEAD
+<<<<<<< HEAD
         <div class="column two-thirds">
 
             <div id="map-wrapper">
@@ -61,17 +46,17 @@
                     </div>
                 </div>
                 <div class="rowfixfull clearfix">
-                    <div class="startmedia-wrapper">
+                    <div class="startmedia-wrapper" id="{{cur_route.id}}">
 
                         <div class="top-bar clearfix">
                             <button class="btn close" onclick = "location.href='/editor/media/{{cur_route.id}}/'">Avbryt</button>
                             <div class="header-text">
-                                <h3>{{marker_id}}</h3>
+                                <h3>{{marker_name}}</h3>
                                 <p class="small-text">Dra för att ändra ordning.</p>
                             </div>
-                            <button class="btn right klar"  >Klar</button>
+                            <button class="btn right klar" onclick="addmedia()">Klar</button>
                         </div>
-                        <ul class="media-files">
+                        <ul class="media-files" id="{{marker_id}}">
                            <!--  <li class="clearfix">
                                 <span class="typcn typcn-arrow-unsorted"></span>
 
@@ -89,8 +74,8 @@
                             {% for m in marker_media %}
                                 <li class="clearfix">
                                     <span class="typcn typcn-arrow-unsorted"></span>
-
-                                    <button class="media-opt btn round" name="{{ m.id }}"><span class="typcn typcn-info-large"></span></button>
+                                    
+                                    <button class="media-opt btn round" id="{{m.name}}" name="{{ m.id }}" value="{{m.options}}"><span class="typcn typcn-info-large"></span></button>
                                     <p>{{ m.name }}</p>
                                     
                                     <form action="" method="post"> 
@@ -109,17 +94,130 @@
                     </div>
                 </div>
             </div>
+=======
+        <div class="btn-block">
+          <button class="btn green round"> <span class="typcn typcn-cloud-storage"> </span></button>
+          <p class="label-bottom">Spara på kontot</p>
+>>>>>>> FETCH_HEAD
         </div>
+        <h2 class="text-center">3. Lägg till media</h2>
+      </div>
     </div>
+    <div class="rowfixfull clearfix">
+      <div class="startmedia-wrapper">
+
+        <div class="top-bar clearfix">
+          <button class="btn close" onclick = "location.href='/editor/media/{{cur_route.id}}/'">Avbryt</button>
+          <div class="header-text">
+            <h3>{{marker_id}}</h3>
+            <p class="small-text">Dra för att ändra ordning.</p>
+          </div>
+          <button class="btn right klar"  >Klar</button>
+        </div>
+        <ul class="media-files">
+          <!--  <li class="clearfix">
+                <span class="typcn typcn-arrow-unsorted"></span>
+
+                <button class="media-opt btn round"><span class="typcn typcn-info-large"></span></button>
+                <p>Medianamnet</p>
+                <button class="btn round orange minus"><span class="typcn typcn-minus"></span></button>
+          </li>
+          <li class="clearfix">
+            <span class="typcn typcn-arrow-unsorted"></span>
+
+            <button class="media-opt btn round"><span class="typcn typcn-info-large"></span></button>
+            <p>Medianamnet</p>
+            <button class="btn round orange minus"><span class="typcn typcn-minus"></span></button>
+          </li>  -->
+          {% for m in marker_media %}
+          <li class="clearfix">
+            <span class="typcn typcn-arrow-unsorted"></span>
+
+            <button class="media-opt btn round" name="{{ m.id }}"><span class="typcn typcn-info-large"></span></button>
+            <p>{{ m.name }}</p>
+            
+            <form action="" method="post"> 
+              {% csrf_token %}
+              <input type="hidden" name="delmedia" value="{{ m.id }}">
+              <button class="btn round orange minus"><span class="typcn typcn-minus"></span></button>
+            </form>  
+          </li>
+          {% endfor %}
+        </ul>
+        <div class="add-media clearfix" name="{{prev_media_type}}">
+          <button class="btn round green" ><span class="typcn typcn-plus"></span></button>
+
+          <p class="mini-text">Lägg till media</p>
+        </div>
+      </div>
+    </div>
+=======
+        <div class="btn-block">
+          <button class="btn green round"> <span class="typcn typcn-cloud-storage"> </span></button>
+          <p class="label-bottom">Spara på kontot</p>
+        </div>
+        <h2 class="text-center">3. Lägg till media</h2>
+      </div>
+    </div>
+    <div class="rowfixfull clearfix">
+      <div class="startmedia-wrapper">
+
+        <div class="top-bar clearfix">
+          <button class="btn close" onclick = "location.href='/editor/media/{{cur_route.id}}/'">Avbryt</button>
+          <div class="header-text">
+            <h3>{{marker_id}}</h3>
+            <p class="small-text">Dra för att ändra ordning.</p>
+          </div>
+          <button class="btn right klar"  >Klar</button>
+        </div>
+        <ul class="media-files">
+          <!--  <li class="clearfix">
+                <span class="typcn typcn-arrow-unsorted"></span>
+
+                <button class="media-opt btn round"><span class="typcn typcn-info-large"></span></button>
+                <p>Medianamnet</p>
+                <button class="btn round orange minus"><span class="typcn typcn-minus"></span></button>
+          </li>
+          <li class="clearfix">
+            <span class="typcn typcn-arrow-unsorted"></span>
+
+            <button class="media-opt btn round"><span class="typcn typcn-info-large"></span></button>
+            <p>Medianamnet</p>
+            <button class="btn round orange minus"><span class="typcn typcn-minus"></span></button>
+          </li>  -->
+          {% for m in marker_media %}
+          <li class="clearfix">
+            <span class="typcn typcn-arrow-unsorted"></span>
+
+            <button class="media-opt btn round" name="{{ m.id }}"><span class="typcn typcn-info-large"></span></button>
+            <p>{{ m.name }}</p>
+            
+            <form action="" method="post"> 
+              {% csrf_token %}
+              <input type="hidden" name="delmedia" value="{{ m.id }}">
+              <button class="btn round orange minus"><span class="typcn typcn-minus"></span></button>
+            </form>  
+          </li>
+          {% endfor %}
+        </ul>
+        <div class="add-media clearfix" name="{{prev_media_type}}">
+          <button class="btn round green" ><span class="typcn typcn-plus"></span></button>
+
+          <p class="mini-text">Lägg till media</p>
+        </div>
+      </div>
+    </div>
+>>>>>>> FETCH_HEAD
+
     <div class="fadeBG"></div>
     <div class="upload-file">
-        <h2>Ladda upp fil</h2>
-        <form action="" method="post" enctype="multipart/form-data">
-           {% csrf_token %}  
-            <input id="id_media_file" type="file" name="media_file">
-            <button class="upload-btn btn orange large"><span class="typcn typcn-upload"></span> Ladda upp </button>
+      <h2>Ladda upp fil</h2>
+      <form action="" method="post" enctype="multipart/form-data">
+	{% csrf_token %}  
+	<input id="id_media_file" type="file" name="media_file">
+	<button class="upload-btn btn orange large"><span class="typcn typcn-upload"></span> Ladda upp </button>
 
-        </form>
-        <button class="upload-abort btn">Avbryt</button>
+      </form>
+      <button class="upload-abort btn">Avbryt</button>
     </div>
-{% endblock %}
+    {% endblock %}

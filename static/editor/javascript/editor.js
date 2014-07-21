@@ -16,7 +16,9 @@ $('document').ready(function(){
             If Not has Active class, Hide all tour-menus
             and display the clicked one
          */
+
         if(!$(this).hasClass('active')){
+	    document.location.pathname = "editor/general/" + $(this)[0].id;
             $(".tour-list li").each(function() {
                 $(this).removeClass('active');
                 $(this).find('.typcn-chevron-right').removeClass('rotate90');
@@ -39,7 +41,26 @@ $('document').ready(function(){
             $(this).find('.typcn-chevron-right').removeClass('rotate90');
         }
     });
-
+    
+    var elements = $('.media-opt');
+    var option;
+    
+    if(elements.length>=1) {
+    	for(var i=0;i<elements.length;i++) {
+    	option = elements[i].value;
+    	console.log(elements[i]);
+    	if(option!=1 && option!=2 && option!=3) {
+        	
+    		elements[i].disabled = true;
+        	
+          }
+    	}
+    } 	
+    
+    
+    
+    
+    
     $('.media-opt').on('click',function(){
         createMediaOptionsWindow($(this));
     });
@@ -48,10 +69,15 @@ $('document').ready(function(){
     $('.add-media').on('click',function(){
        //alert($('.add-media').attr("name"));	
        var media_type = $('.add-media').attr("name");
-       alert(media_type);
-       if(media_type=="None")
+       //alert(media_type);
+       /*var elements = $('.media-opt');
+       
+       var filename = null;
+       
+       
+       if(media_type=="None" && elements.length>0 && (filename.localeCompare("m4a")==-1 && filename.localeCompare("mp3")==-1 && filename.localeCompare("m4v")==-1))
     	   alert("choose media type for uploaded file");
-       else
+       else*/
            openFileUpload($(this));
     });
     
@@ -63,9 +89,92 @@ $('document').ready(function(){
      });
     
    
-    
-       
+    $('#hideMenu').on('click', function(){
+	if (document.getElementById("contentDiv").className == "column two-thirds") {
+	    document.getElementById("menuDiv").style.display = 'none';
+	    document.getElementById("contentDiv").className = "column half";
+	}
+	else {
+	    //document.getElementById("menuDiv").className = "column third";
+	    document.getElementById("menuDiv").style.display = 'block';
+	    document.getElementById("contentDiv").className = "column two-thirds";
+	}
+    });
 });
+<<<<<<< HEAD
+
+function addmedia() {
+	
+	var media = $('.media-opt');
+	
+	
+    var markers = []
+    
+    for(var i=0;i<media.length;i++) {
+    	
+    	var option = media[i].value
+    	
+    	if(option=="None")
+    		option=0
+    		
+    	
+    	 var marker_id = {
+    				
+    				"id":media[i].name,
+    				"option":option
+    				
+    		};
+    		markers.push(marker_id);
+    }
+    
+    var markers_media={};
+    
+    markers_media['markers_media'] = markers;
+    
+    console.log(JSON.stringify(markers_media));
+   
+    var route_id = $('.startmedia-wrapper').attr("id");
+    var marker_id = $('.media-files').attr("id");
+    
+    
+    var csrftoken = getCookie('csrftoken');
+    $.ajaxSetup({
+        crossDomain: false, // obviates need for sameOrigin test
+        beforeSend: function(xhr, settings) {
+            if (!csrfSafeMethod(settings.type)) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                console.log(csrftoken);
+            }
+        }
+    });  
+	
+  	
+	var request = $.ajax({
+		url: "/editor/media/marker/"+route_id+"/"+marker_id+"/",
+        type: "POST",
+        dataType:"json",
+        data: JSON.stringify(markers_media),
+        contentType: "application/json;charset=utf-8",
+       
+        success: function(res){
+            console.log("SUCCESS");
+            window.location.href="/editor/media/"+route_id+"/"
+            //alert("Hi");
+            //console.log(res);
+         }
+    }); 
+	
+	 request.done(function(msg) {
+         console.log(msg);
+     });
+
+     request.fail(function(jqXHR, textStatus) {
+         //alert( "Request failed: " + textStatus );
+     });
+	
+}
+=======
+>>>>>>> FETCH_HEAD
 
 // Opens the window with publish options
 function openFileUpload(e){
@@ -114,10 +223,11 @@ function publishJsonFile(e){
         $("input[name='publish']").prop('checked',false);
     });
     $btn.on('click',function(){
-        publishSelectedTrail(function(){
+        publishSelectedTrail();
             $bg.fadeOut();
             $upload.fadeOut();
-        });
+            $("input[name='publish']").prop('disabled',false);
+            $("input[name='publish']").prop('checked',false);
 
     })
 
@@ -160,7 +270,7 @@ function uploadSelectedFile(){
         }
     });
     console.log("entered "+$( '#media_file' ).value);
-    console.log($( '#media_file' )[0].files[0]);
+    //console.log($( '#media_file' )[0].files[0]);
     console.log("entered1");
 
     var formData = new FormData();
@@ -188,7 +298,52 @@ function uploadSelectedFile(){
 
 function publishSelectedTrail(){
 	
-	alert("Start publishing "+$("input[name='publish']").val());
+	
+	var csrftoken = getCookie('csrftoken');
+    $.ajaxSetup({
+        crossDomain: false, // obviates need for sameOrigin test
+        beforeSend: function(xhr, settings) {
+            if (!csrfSafeMethod(settings.type)) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                console.log(csrftoken);
+            }
+        }
+    });
+	
+	//alert("Start publishing "+$("input[name='publish']").val());
+	
+	var markersMedia = $('.markersCheckboxes');
+    
+	 
+	
+    if(markersMedia.length!=0) {
+    	console.log(markersMedia);
+    	console.log(markersMedia[0].id);
+    	console.log(markersMedia[0].checked);
+    	
+    }
+    
+    var markers = []
+    
+    for(var i=0;i<markersMedia.length;i++) {
+    	
+    	console.log(markersMedia[i].checked);
+    	var marker_id = {
+    				
+    				"id":markersMedia[i].id,
+    				"checked":markersMedia[i].checked
+    				
+    		};
+    		markers.push(marker_id);
+    		
+    }
+    
+    var markers_media={};
+    
+    markers_media['markers_media'] = markers;
+    
+    console.log(JSON.stringify(markers_media));
+
 	
    /* var csrftoken = getCookie('csrftoken');
     $.ajaxSetup({
@@ -222,14 +377,27 @@ function publishSelectedTrail(){
     });*/ 
 	
 	var request = $.ajax({
-        url: "/editor/publish/"+$("input[name='publish']").val()+"/",
-        type: "GET",
+		url: "/editor/publish/"+$("input[name='publish']").val()+"/",
+        type: "POST",
+        dataType:"json",
+        data: JSON.stringify(markers_media),
+        contentType: "application/json;charset=utf-8",
+       
         success: function(res){
             console.log("SUCCESS");
-            alert("Hi");
+            
+            //alert("Hi");
             //console.log(res);
-        }
+         }
     }); 
+	
+	 request.done(function(msg) {
+         console.log(msg);
+     });
+
+     request.fail(function(jqXHR, textStatus) {
+         //alert( "Request failed: " + textStatus );
+     });
 }
 
 function createMediaOptionsWindow(e){
@@ -252,25 +420,37 @@ function createMediaOptionsWindow(e){
     var $option2 = $('<div>',{class:"option"});
     var $option3 = $('<div>',{class:"option"});
     var $label1 = $('<label>',{class:"small-text",text:"Panorama"});
-    var $radio1 = $('<input>',{type:"radio",name:"options",value:"panorama"});
+    var $radio1 = $('<input>',{type:"radio",name:"options",value:"panorama",checked:false});
     var $label2;
     var $radio2;
     var elements = $('.media-opt');
     
+    if(e.val()=="1")
+      $radio1.prop("checked",true);
+     
+     
+    
     if((elements.length==1) &&(e.attr('name') == $('.media-opt')[0].name)) {
     
     	$label2 = $('<label>',{class:"small-text",text:"Visas med kamerabild i bakgrunden"});
-        $radio2 = $('<input>',{type:"radio",name:"options",value:"camera_bg"});
+        $radio2 = $('<input>',{type:"radio",name:"options",value:"camera_bg",checked:false});
     }
     else {
     	
     	var $label2 = $('<label>',{class:"small-text",text:"Visas med kamerabild i bakgrunden",style:"color:#aaa"});
-        var $radio2 = $('<input>',{type:"radio",name:"options",value:"camera_bg",disabled:'disabled'});
+        var $radio2 = $('<input>',{type:"radio",name:"options",value:"camera_bg",disabled:'disabled',checked:false});
     }
+    
+    if(e.val()=="2")
+    	$radio2.prop("checked",true);
+    
     //var $label2 = $('<label>',{class:"small-text",text:"Visas med kamerabild i bakgrunden"});
     //var $radio2 = $('<input>',{type:"radio",name:"options",value:"camera_bg"});
     var $label3 = $('<label>',{class:"small-text",text:"Visas i helskärm"});
-    var $radio3 = $('<input>',{type:"radio",name:"options",value:"fullscreen"});
+    var $radio3 = $('<input>',{type:"radio",name:"options",value:"fullscreen",checked:false});
+    
+    if(e.val()=="3")
+    	$radio3.prop("checked",true);
 
     var $bg = $('<div>',{class:"fadeBG"});
 
@@ -298,14 +478,14 @@ function createMediaOptionsWindow(e){
     	$mediabox.remove();
 	    $bg.remove();
 	    
-	    if(($radio1).val() == "panorama")
+	    if(($radio1).prop("checked") == true)
 	    	type=1;
-	    if(($radio2).val() == "camera_bg")
+	    if(($radio2).prop("checked") == true)
 	    	type=2;
-	    if(($radio3).val() == "fullscreen")
+	    if(($radio3).prop("checked") == true)
 	    	type=3;
 	    	
-    	addImageType(e.attr('name'),type);
+    	addImageType(e,e.attr('name'),type);
     	
     })
 
@@ -339,7 +519,7 @@ function createMediaOptionsWindow(e){
     
 }
 
-function addImageType(button_id,type){
+function addImageType(e,button_id,type){
 	
 	var csrftoken = getCookie('csrftoken');
     $.ajaxSetup({
@@ -352,10 +532,12 @@ function addImageType(button_id,type){
         }
     });
     
+    var route_id = $('.startmedia-wrapper').attr("id");
+    var marker_id = $('.media-files').attr("id");
     
 	
 	var request = $.ajax({
-        url: "/editor/media/marker/2/1?id="+button_id+"&type="+type,
+        url: "/editor/media/marker/"+route_id+"/"+marker_id+"?id="+button_id+"&type="+type,
         type: "GET",
         //data: "id="+$('.media-opt').attr("name")+"&type="+type,
         xhr: function() {  // custom xhr
@@ -363,9 +545,13 @@ function addImageType(button_id,type){
             return myXhr;
         },
         success: function(res){
-            console.log("SUCCESS");
+            console.log("SUCCESS entered");
+            //console.log(res['imageType']);
             //alert("Hi");
-            //console.log(res);
+            //console.log("Hi");
+            console.log(res);
+            $('.add-media').attr("name",res);
+            e.val(res);
         }
     });
 }

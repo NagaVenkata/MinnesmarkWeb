@@ -58,6 +58,7 @@ class Marker(models.Model):
     
     def as_json(self):
         return dict(
+            name = self.name,
             markerName=self.markerName,
             markerSize=self.markerSize,
             collectItem = self.collectItem

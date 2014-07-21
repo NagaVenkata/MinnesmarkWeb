@@ -1,31 +1,35 @@
-{% extends "base.html" %}
+{% extends "editor/editorbase.html" %}
 
 {% block title %}Editor{% endblock %}
 
 {% block metadata %}
-    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
 
-    <link rel="stylesheet"
-          href="/static/editor/editor.css"/>
+<link rel="stylesheet"
+      href="/static/editor/editor.css"/>
 
-    <script type="text/javascript" src="/static/editor/javascript/editor.js"></script>
-    <link href="/static/editor/css/no-theme/jquery-ui-1.10.4.custom.css" rel="stylesheet">
-    <script src="/static/editor/javascript/jquery-ui-1.10.4.custom.min.js"></script>
-    <script type="text/javascript" src="/static/editor/javascript/general.js"></script>
+<script type="text/javascript" src="/static/editor/javascript/editor.js"></script>
+<link href="/static/editor/css/no-theme/jquery-ui-1.10.4.custom.css" rel="stylesheet">
+<script src="/static/editor/javascript/jquery-ui-1.10.4.custom.min.js"></script>
+<script type="text/javascript" src="/static/editor/javascript/general.js"></script>
 
-    <script type="text/javascript" src="/static/javascript/setActiveChoice.js"></script>
+<script type="text/javascript" src="/static/javascript/setActiveChoice.js"></script>
 
 {% endblock %}
 
 
 {% block content %}
-    <div class="row clearfix">
 
-        <div class="column third">
+<div class="rowfixfull clearfix">
 
-            {% include 'editor/editormenu.html' %}
-            {% include 'editor/route_menu.html' %}
+  <div class="publish-wrapper">
+    <div class="publish-tour clearfix">
+      <span class="typcn typcn-eye-outline"></span>
+      <h2>Publicera</h2>
+      <input type="checkbox" name="publish" value="{{cur_route}}">
 
+<<<<<<< HEAD
+<<<<<<< HEAD
         </div>
         <div class="column two-thirds">
 
@@ -81,22 +85,70 @@
                                 <p class="small-text">starfilm.mp4</p>
                             </li>
                         </ul>
+                        {% for marker in markers%}
+                        <h3>{{marker.getMarkerName}}</h3>
+                        <p class="small-text">Markera media som skickas till användarens e-post i slutet av rundan</p>
+                        <ul class="markersmedia-list">
+                            {% for m in marker.getMarkerMedia %}
+                                <li class="clearfix">
+                                    <input class="markersCheckboxes" type="checkbox" id="{{m.id}}" name="{{ m.name }}"/>
+                                    <p class="small-text">{{ m.name }}</p>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                       {% endfor %}
                     </div>
                 </div>
             </div>
         </div>
+=======
+      <p class="small-text">www.minnesmark.se/användarnman/tour-name</p>
+>>>>>>> FETCH_HEAD
+=======
+      <p class="small-text">www.minnesmark.se/användarnman/tour-name</p>
+>>>>>>> FETCH_HEAD
     </div>
-    <div class="publish"></div>
-    <div class="publish-file">
-        <h2>Vill du varkligen publicera rundvan?</h2>
-        <!-- <form action="" method="post" enctype="multipart/form-data">
-           {% csrf_token %}  
-            <input id="id_media_file" type="file" name="media_file">
-            <button class="upload-btn btn orange large"><span class="typcn typcn-upload"></span> Ladda upp </button>
+    <button class="btn full">
+      <span class="typcn typcn-printer"></span>
+      Skriv ut markörer och karta
+    </button>
+    <h3>Startmedia</h3>
+    <p class="small-text">Markera media som skickas till användarens e-post i slutet av rundan</p>
+    <ul class="startmedia-list">
+      {% for m in start_media %}
+      <li class="clearfix">
+        <input type="checkbox" name="{{ m.name }}"/>
+        <p class="small-text">{{ m.name }}</p>
+      </li>
+      {% endfor %}
+    </ul>
+    <h3>Media på station 1</h3>
+    <p class="small-text">Markera media som skickas till användarens e-post i slutet av rundan</p>
+    <ul class="media-list">
+      <li class="clearfix">
+        <input type="checkbox" name="MEDIANAMNETHÖR!"/>
+        <p class="small-text">starbild.png</p>
+      </li>
+      <li class="clearfix">
+        <input type="checkbox" name="MEDIANAMNETHÖR!"/>
+        <p class="small-text">starfilm.mp4</p>
+      </li>
+    </ul>
+  </div>
+</div>
 
-        </form>  -->
-        <button class="publish btn">Ja</button>
-        <button class="publish-abort btn">Nej</button> 
-    </div>
-    
+
+<div class="publish"></div>
+<div class="publish-file">
+  <h2>Vill du varkligen publicera rundvan?</h2>
+  <!-- <form action="" method="post" enctype="multipart/form-data">
+       {% csrf_token %}  
+       <input id="id_media_file" type="file" name="media_file">
+       <button class="upload-btn btn orange large"><span class="typcn typcn-upload"></span> Ladda upp </button>
+
+  </form>  -->
+  <button class="publish btn">Ja</button>
+  <button class="publish-abort btn">Nej</button> 
+</div>
+
 {% endblock %}

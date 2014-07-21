@@ -40,8 +40,8 @@
         }, 
         "attributes": {
             "index": 3, 
-            "latitude": 58.39929022727814, 
-            "longitude": 15.573968119462279, 
+            "latitude": 58.39922276474855, 
+            "longitude": 15.573667712052611, 
             "radius": 10.0, 
             "shouldDisplayOnCompass": false, 
             "swingPoint": false
@@ -61,7 +61,7 @@
             "latitude": 58.398210811311586, 
             "longitude": 15.572981066544799, 
             "radius": 10.0, 
-            "shouldDisplayOnCompass": true, 
+            "shouldDisplayOnCompass": false, 
             "swingPoint": true
         }, 
         "name": "station1_swingpoint1", 
@@ -79,7 +79,7 @@
             "latitude": 58.39893323659315, 
             "longitude": 15.573557741483, 
             "radius": 10.0, 
-            "shouldDisplayOnCompass": true, 
+            "shouldDisplayOnCompass": false, 
             "swingPoint": true
         }, 
         "name": "station1_swingpoint2", 
@@ -95,19 +95,36 @@
         "attributes": {
             "collectItem": false, 
             "markerName": "patt.marker1", 
-            "markerSize": 12484
+            "markerSize": 12484, 
+            "name": "Marker1"
         }, 
         "name": "Marker1", 
         "type": "marker"
     }, 
     {
         "action": {
-            "image-disappeared": [
-                "marker1_Image2"
+            "marker-found": [
+                "MarkerUnDetect", 
+                "marker2_Image1"
             ]
         }, 
         "attributes": {
             "collectItem": false, 
+            "markerName": "patt.marker2", 
+            "markerSize": 12484, 
+            "name": "Marker2"
+        }, 
+        "name": "Marker2", 
+        "type": "marker"
+    }, 
+    {
+        "action": {
+            "image-disappeared": [
+                "marker1_Audio2"
+            ]
+        }, 
+        "attributes": {
+            "collectItem": true, 
             "imageName": "search.png", 
             "imageSize": 992
         }, 
@@ -116,16 +133,31 @@
     }, 
     {
         "action": {
-            "image-disappeared": [
-                "marker1_Image3"
+            "audio-finished-playing": [
+                "MarkerDetect", 
+                "Done"
             ]
         }, 
         "attributes": {
             "collectItem": false, 
-            "imageName": "upload.png", 
-            "imageSize": 583
+            "imageName": "instruktion_station1_vedtrad2.aiff", 
+            "imageSize": 385086
         }, 
-        "name": "marker1_Image2", 
+        "name": "marker1_Audio2", 
+        "type": "audio"
+    }, 
+    {
+        "action": {
+            "image-disappeared": [
+                "marker2_Image2"
+            ]
+        }, 
+        "attributes": {
+            "collectItem": true, 
+            "imageName": "camera.png", 
+            "imageSize": 28634
+        }, 
+        "name": "marker2_Image1", 
         "type": "image"
     }, 
     {
@@ -137,10 +169,10 @@
         }, 
         "attributes": {
             "collectItem": false, 
-            "imageName": "camera.png", 
-            "imageSize": 28634
+            "imageName": "upload.jpg", 
+            "imageSize": 1916
         }, 
-        "name": "marker1_Image3", 
+        "name": "marker2_Image2", 
         "type": "image"
     }
 ]

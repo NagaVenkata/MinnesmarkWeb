@@ -15,7 +15,7 @@ import sndhdr
 from editor.models import Media, Route, Station, Polyline, Marker
 from minnesmark.settings import PROJECT_ROOT
 from editor.jsonObject import TitleEvents
-from editor.jsonObject import Station_SwingPointEvents,MarkerEvent,MediaEvent
+from editor.jsonObject import Station_SwingPointEvents,MarkerEvent,MediaEvent,Marker_Media
 
 # Login_required means that the user has to be looged in to see that specific page
 
@@ -133,6 +133,30 @@ def render_page_marker(request,route_id,marker_id):
         
         if request.is_ajax():
             print("ajax request")
+            if(request.method=="POST"):
+                response_data = {}
+                try:
+                    json_str = request.body.decode(encoding='UTF-8')
+                    json_obj = json.loads(json_str)
+                    markers_media = json_obj['markers_media']
+                    print(len(markers_media))
+                    order_count=1
+                    if(len(markers_media)>0):
+                        for marker_media in markers_media:
+                            media_object = Media.objects.filter(id=marker_media['id'])
+                            media = media_object[0]
+                            media.order = order_count
+                            media.options = marker_media['option']
+                            media.save()
+                            order_count +=1
+                        resetMarkerEvents_nextEvents(route_id,request.user,marker_id)
+                except ValidationError as e:
+                    print(e.args)
+                    response_data['result'] = 'failed'
+                    response_data['message'] = 'Kunde inte ladda data'
+            
+                return HttpResponse(json.dumps(response_data), content_type="application/json")
+            
             print(request.GET['id'])
             print(request.GET['type'])
             marker_object = Marker.objects.filter(route_id=route_id,index=marker_id)
@@ -148,7 +172,23 @@ def render_page_marker(request,route_id,marker_id):
                 print(media_object[0].options)
             except ValidationError as e:
                 print(e.args)
+            
+            marker_media = []
+            for m in Media.objects.filter(route=route,marker=marker_object[0], user=request.user).order_by('order'):
+                marker_media.append(m.as_json())
+            
+            #media_option = None
+        
+            #if(len(marker_media) == 1):
+            #    media_option = marker_media[0]['options']
+        
+            #if(len(marker_media)>1):
+            #   print(marker_media[len(marker_media)-1]['options'])
+            #   media_option = marker_media[len(marker_media)-1]['options']
 
+            media_type = request.GET['type']    
+            return HttpResponse(media_type)
+            
         
         #stations = Station.objects.filter(route=route)
         marker_object = Marker.objects.filter(route_id=route_id,index=marker_id)
@@ -185,7 +225,8 @@ def render_page_marker(request,route_id,marker_id):
                                   {'marker_media':marker_media,
                                    'routes': routes,
                                    'cur_route':route,
-                                   'marker_id':markerName,
+                                   'marker_id':marker_id,
+                                   'marker_name':markerName,
                                    'prev_media_type':media_option
                                    },
                               context_instance=RequestContext(request))
@@ -248,13 +289,45 @@ def render_page_publish(request,route_id):
         return HttpResponseRedirect('/editor')
     if request.is_ajax():
         print("ajax request")
+        response_data = {}
+        try:
+            json_str = request.body.decode(encoding='UTF-8')
+            json_obj = json.loads(json_str)
+            markers_media = json_obj['markers_media']
+            print(len(markers_media))
+            print("lenght "+str(len(json_obj)))
+            if(len(markers_media)>0):
+                for marker_media in markers_media:
+                    media_object = Media.objects.filter(id=marker_media['id'])
+                    media = media_object[0]
+                    media.treasure = marker_media['checked']
+                    media.save()
+                
+            
+        except:
+            response_data['result'] = 'failed'
+            response_data['message'] = 'Kunde inte ladda data'
+            
         publish_trail(request,route_id)
+        return HttpResponse(json.dumps(response_data), content_type="application/json")
 
     #Get all media set to startmedia
     start_media = []
     for m in Media.objects.filter(route=route,mediatype=Media.STARTMEDIA, user=request.user).order_by('order'):
         start_media.append(m.as_json())
-    return render_to_response('editor/publish.html', {'routes': routes,'cur_route':route_id,'start_media':start_media},
+    
+    markers = []
+    
+    #for each marker get the media associated with it
+    for m in Marker.objects.filter(route=route):
+        marker = Marker_Media(m.name) 
+        for media in Media.objects.filter(route=route,marker=m,user=request.user).order_by('order'):
+            marker.setMarkerMedia(media.as_json)
+        markers.append(marker)
+    
+    
+         
+    return render_to_response('editor/publish.html', {'routes': routes,'cur_route':route_id,'start_media':start_media,"markers":markers},
                               context_instance=RequestContext(request))
 
 
@@ -420,6 +493,48 @@ def handle_upload(request,f,route_id,station_id,marker_id):
 
     #change to user folder
     os.chdir(request.user.username)
+    
+    route = Route.objects.filter(id=route_id)
+    
+    try:
+        #get the route name and make a directory with that name
+        if(route[0].name!="Ny Route"):
+            os.mkdir(route[0].name)
+            os.chdir(route[0].name)
+        else:
+            os.mkdir(route[0].id)
+            os.chdir(route[0].id)
+    except:
+        pass
+    
+    if(route[0].name!="Ny Route"):
+        os.chdir(route[0].name)
+    else:
+        os.chdir(route[0].id)
+    
+    folder = os.getcwd()
+    
+    if(isImageFile(f.name)):
+        try:
+            os.mkdir(folder+"/images")
+            os.chdir(folder+"/images")
+        except:
+            os.chdir(folder+"/images")
+    
+    if(isAudioFile(f.name)):
+        try:
+            os.mkdir(folder+"/audios")
+            os.chdir(folder+"/audios")
+        except:
+            os.chdir(folder+"/audios")
+    if(isVideoFile(f.name)):
+        try:
+            os.mkdir(folder+"/videos")
+            os.chdir(folder+"/videos")
+        except:
+            os.chdir(folder+"/videos")    
+        
+    
     folder = os.getcwd()
 
     #Fullpath to file
@@ -452,7 +567,7 @@ def handle_upload(request,f,route_id,station_id,marker_id):
         markers = Media.objects.filter(marker=marker_object[0],mediatype=Media.AR_MEDIA, user=userobject)
         
     print(route_object)    
-    print(marker_object[0])
+    #print(marker_object[0])
     
     type=None
         
@@ -487,18 +602,21 @@ def handle_upload(request,f,route_id,station_id,marker_id):
         
         marker_media = None
         nextEventName = None
-        
+        option = None
         
         
         if(isImageFile(f.name)):
             eventName = "marker"+str(marker_id)+"_"+"Image"+str(media_count+1)
             type="image"
+            option=3
         if(isAudioFile(f.name)):
             eventName = "marker"+str(marker_id)+"_"+"Audio"+str(media_count+1)
             type="audio"
+            option=None
         if(isVideoFile(f.name)):
             eventName = "marker"+str(marker_id)+"_"+"Video"+str(media_count+1)
-            type="video"    
+            type="video"
+            option = None    
         
             
         
@@ -518,6 +636,7 @@ def handle_upload(request,f,route_id,station_id,marker_id):
                 mediatype=Media.AR_MEDIA,
                 user=userobject,
                 order=media_count + 1,
+                options = option,
                 station=None,
                 marker=marker_object[0],
                 nextEventName=nextEventName,
@@ -532,9 +651,10 @@ def handle_upload(request,f,route_id,station_id,marker_id):
         return False
 
 def isImageFile(fileName):
-    fileExt = imghdr.what(fileName) 
+    #fileExt = imghdr.what(fileName)
+    fileExt = os.path.splitext(fileName)[1] 
     
-    if(fileExt == "jpg" or fileExt == "JPG" or fileExt == "jpeg" or fileExt == "JPEG" or fileExt == "png" or fileExt == "PNG"  or fileExt == "bmp" or fileExt == "BMP" or fileExt == "gif" or fileExt == "GIF"):
+    if(fileExt == ".jpg" or fileExt == ".JPG" or fileExt == ".jpeg" or fileExt == ".JPEG" or fileExt == ".png" or fileExt == ".PNG"  or fileExt == ".bmp" or fileExt == ".BMP" or fileExt == ".gif" or fileExt == ".GIF"):
         return True
     else:
         return False
@@ -680,9 +800,37 @@ def delete_media(media_id, user_id,route_id,station_id,marker_id):
     if m.user.id == u.id or u.is_superuser:
         os.remove(m.filepath)
         m.delete()
+                
+            
+            #===================================================================
+            # index=0
+            # for marker_object in markers:
+            #     if(marker_object.id == m.id and marker_object.id!=markers[0].id):
+            #         if(index!=len(markers)-1):
+            #             markers[index-1].nextEventName = markers[index+1].eventName
+            #             if(index+2<len(markers)):
+            #                 markers[index+1].nextEventName = markers[index+2].eventName
+            #             else:
+            #                 markers[index+1].nextEventName = None
+            #             markers[index-1].save()
+            #             markers[index+1].save()
+            #             break
+            #         else:
+            #             markers[index-1].nextEventName = None
+            #             markers[index-1].save()
+            #             break
+            #         
+            #         
+            #     index+=1           
+            #===================================================================
+
         
-        
-        if(marker_id!=0):
+        return True
+    else:
+        return False
+
+def resetMarkerEvents_nextEvents(route_id,u,marker_id):
+    if(marker_id!=0):
             marker = Marker.objects.filter(route_id =route_id,index = marker_id) 
             markers = Media.objects.filter(marker=marker[0],user=u)
             if(len(markers)>1):
@@ -752,37 +900,7 @@ def delete_media(media_id, user_id,route_id,station_id,marker_id):
                 if(isVideoFile(markers[0].filename)):
                     markers[0].eventName = "marker"+str(marker_id)+"_Video"+str(1)
                     markers[0].save()
-                    
-                    
-                
-                
-            
-            #===================================================================
-            # index=0
-            # for marker_object in markers:
-            #     if(marker_object.id == m.id and marker_object.id!=markers[0].id):
-            #         if(index!=len(markers)-1):
-            #             markers[index-1].nextEventName = markers[index+1].eventName
-            #             if(index+2<len(markers)):
-            #                 markers[index+1].nextEventName = markers[index+2].eventName
-            #             else:
-            #                 markers[index+1].nextEventName = None
-            #             markers[index-1].save()
-            #             markers[index+1].save()
-            #             break
-            #         else:
-            #             markers[index-1].nextEventName = None
-            #             markers[index-1].save()
-            #             break
-            #         
-            #         
-            #     index+=1           
-            #===================================================================
-
-        
-        return True
-    else:
-        return False
+    
 
 
 #Check if route exist or you own it
