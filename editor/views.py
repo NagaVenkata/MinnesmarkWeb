@@ -12,6 +12,7 @@ from editor import models
 import editor
 import imghdr
 import sndhdr
+from reportlab.pdfgen import canvas
 from editor.models import Media, Route, Station, Polyline, Marker
 from minnesmark.settings import PROJECT_ROOT
 from editor.jsonObject import TitleEvents
@@ -52,6 +53,8 @@ def render_page_general(request,route_id):
     route = validateRoute(route_id,request.user)
     if route is False:
         return HttpResponseRedirect('/editor')
+    
+    
 
     route_name = route.name
     #If POST request to page
@@ -99,6 +102,9 @@ def render_page_media(request,route_id):
     routes = get_all_routes_from_user(request.user.id)
 
     route = validateRoute(route_id,request.user)
+    
+    
+    
     if route is False:
         return HttpResponseRedirect('/editor')
 
@@ -289,27 +295,31 @@ def render_page_publish(request,route_id):
         return HttpResponseRedirect('/editor')
     if request.is_ajax():
         print("ajax request")
-        response_data = {}
-        try:
-            json_str = request.body.decode(encoding='UTF-8')
-            json_obj = json.loads(json_str)
-            markers_media = json_obj['markers_media']
-            print(len(markers_media))
-            print("lenght "+str(len(json_obj)))
-            if(len(markers_media)>0):
-                for marker_media in markers_media:
-                    media_object = Media.objects.filter(id=marker_media['id'])
-                    media = media_object[0]
-                    media.treasure = marker_media['checked']
-                    media.save()
-                
+        if(request.method=="GET"):
+            c = canvas.Canvas("/Users/Umapathi/Desktop/text.pdf")
+            c.drawString(100,200,"Minnesmark Editor")
+            c.save()
+        if(request.method=="POST"):
+            response_data = {}
+            try:
+                json_str = request.body.decode(encoding='UTF-8')
+                json_obj = json.loads(json_str)
+                markers_media = json_obj['markers_media']
+                print(len(markers_media))
+                print("lenght "+str(len(json_obj)))
+                if(len(markers_media)>0):
+                    for marker_media in markers_media:
+                        media_object = Media.objects.filter(id=marker_media['id'])
+                        media = media_object[0]
+                        media.treasure = marker_media['checked']
+                        media.save()
             
-        except:
-            response_data['result'] = 'failed'
-            response_data['message'] = 'Kunde inte ladda data'
+            except:
+                response_data['result'] = 'failed'
+                response_data['message'] = 'Kunde inte ladda data'
             
-        publish_trail(request,route_id)
-        return HttpResponse(json.dumps(response_data), content_type="application/json")
+            publish_trail(request,route_id)
+            return HttpResponse(json.dumps(response_data), content_type="application/json")
 
     #Get all media set to startmedia
     start_media = []

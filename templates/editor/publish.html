@@ -8,12 +8,20 @@
 <link rel="stylesheet"
       href="/static/editor/editor.css"/>
 
+<script data-main="scripts/editor" src="/static/editor/javascript/require.js"></script>
 <script type="text/javascript" src="/static/editor/javascript/editor.js"></script>
 <link href="/static/editor/css/no-theme/jquery-ui-1.10.4.custom.css" rel="stylesheet">
 <script src="/static/editor/javascript/jquery-ui-1.10.4.custom.min.js"></script>
 <script type="text/javascript" src="/static/editor/javascript/general.js"></script>
 
 <script type="text/javascript" src="/static/javascript/setActiveChoice.js"></script>
+
+
+<script>
+
+
+
+</script>
 
 {% endblock %}
 
@@ -27,11 +35,6 @@
       <span class="typcn typcn-eye-outline"></span>
       <h2>Publicera</h2>
       <input type="checkbox" name="publish" value="{{cur_route}}">
-
-<!-- 
-<<<<<<< HEAD
-<<<<<<< HEAD 
-<<<<<<< HEAD  -->
         </div>
         <!-- 
         <div class="column two-thirds">
@@ -51,7 +54,7 @@
                         </div>
                         <h2 class="text-center">4. Publicera, skriv ut och fördigställ</h2>
                     </div>
-                </div> 
+                </div>
                 <div class="rowfixfull clearfix">
 
                     <div class="publish-wrapper">
@@ -61,11 +64,11 @@
                             <input type="checkbox" name="publish" value="{{cur_route}}">
 
                             <p class="small-text">www.minnesmark.se/användarnman/tour-name</p>
-                        </div>
-                        <button class="btn full">
+                        </div>-->
+                        <button class="btn full" id="print">
                             <span class="typcn typcn-printer"></span>
                             Skriv ut markörer och karta
-                        </button> -->
+                        </button> 
                         <h3>Startmedia</h3>
                         <p class="small-text">Markera media som skickas till användarens e-post i slutet av rundan</p>
                         <ul class="startmedia-list">
@@ -148,7 +151,7 @@
 <div class="publish"></div>
 <div class="publish-file">
   <h2>Vill du varkligen publicera rundvan?</h2>
-  <!-- <form action="" method="post" enctype="multipart/form-data">
+  <!--<form action="" method="post" enctype="multipart/form-data">
        {% csrf_token %}  
        <input id="id_media_file" type="file" name="media_file">
        <button class="upload-btn btn orange large"><span class="typcn typcn-upload"></span> Ladda upp </button>

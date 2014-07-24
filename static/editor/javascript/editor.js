@@ -1,10 +1,17 @@
 /**
  * Created by ante on 2014-03-27.
  */
+var media=0;
+var newMedia=null;
+
+//require('/static/editor/javascript/build/pdfmake.js');
+
 $('document').ready(function(){
     /*
         Get Active and display menu on load
      */
+	
+	
     $('.tour-list li').each(function(){
         if($(this).hasClass('active')){
             $(this).find('.tour-menu').show();
@@ -42,8 +49,16 @@ $('document').ready(function(){
         }
     });
     
+    
     var elements = $('.media-opt');
     var option;
+    
+    media = elements;
+    
+    
+    
+    
+    console.log(elements.length);
     
     if(elements.length>=1) {
     	for(var i=0;i<elements.length;i++) {
@@ -84,9 +99,18 @@ $('document').ready(function(){
     //function called when clicked on publish a trial
     $("input[name='publish']").on('click',function(){
     	
+    	//var w = window.open("about:blank");
+    	//w.document.write("/Users/Umapathi/Desktop/text.pdf");
+    	//w.print();
     	publishJsonFile($(this));
     	$("input[name='publish']").prop('disabled',true);	
      });
+    
+    
+    $('#print').on('click',function(){
+    	
+    	publishTrail();
+    });
     
    
     $('#hideMenu').on('click', function(){
@@ -157,7 +181,7 @@ function addmedia() {
        
         success: function(res){
             console.log("SUCCESS");
-            window.location.href="/editor/media/"+route_id+"/"
+            window.location.href="/editor/media/"+route_id+"/";
             //alert("Hi");
             //console.log(res);
          }
@@ -171,6 +195,25 @@ function addmedia() {
          //alert( "Request failed: " + textStatus );
      });
 	
+}
+
+function exit() {
+	
+	var route_id = $('.startmedia-wrapper').attr("id");
+	
+	
+	
+	if(newMedia==null) {
+		
+		window.location.href="/editor/media/"+route_id+"/";
+	}
+	
+	if(newMedia.length>media.lenght) {
+		
+		alert(newMedia.length);
+		
+		window.location.href="/editor/media/"+route_id+"/";
+	}
 }
 
 // Opens the window with publish options
@@ -286,6 +329,9 @@ function uploadSelectedFile(){
         },
         success: function(res){
             console.log("SUCCESS");
+            newMedia = $('.media-opt');
+            console.log(newMedia);
+            console.log(newMedia.length);
             //console.log(res);
         }
     });
@@ -313,18 +359,18 @@ function publishSelectedTrail(){
     
 	 
 	
-    if(markersMedia.length!=0) {
+    /*if(markersMedia.length!=0) {
     	console.log(markersMedia);
     	console.log(markersMedia[0].id);
     	console.log(markersMedia[0].checked);
     	
-    }
+    }*/
     
     var markers = []
     
     for(var i=0;i<markersMedia.length;i++) {
     	
-    	console.log(markersMedia[i].checked);
+    	//console.log(markersMedia[i].checked);
     	var marker_id = {
     				
     				"id":markersMedia[i].id,
@@ -339,7 +385,7 @@ function publishSelectedTrail(){
     
     markers_media['markers_media'] = markers;
     
-    console.log(JSON.stringify(markers_media));
+    //console.log(JSON.stringify(markers_media));
 
 	
    /* var csrftoken = getCookie('csrftoken');
@@ -397,6 +443,31 @@ function publishSelectedTrail(){
      });
 }
 
+function publishTrail() {
+	
+	var csrftoken = getCookie('csrftoken');
+    $.ajaxSetup({
+        crossDomain: false, // obviates need for sameOrigin test
+        beforeSend: function(xhr, settings) {
+            if (!csrfSafeMethod(settings.type)) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                console.log(csrftoken);
+            }
+        }
+    });
+	
+	var request = $.ajax({
+		url: "/editor/publish/"+$("input[name='publish']").val()+"/",
+        type: "GET",
+        success: function(res){
+            console.log("SUCCESS");
+            
+            //alert("Hi");
+            //console.log(res);
+         }
+    });
+}
+
 function createMediaOptionsWindow(e){
 
     $('body').find('.media-info-box').each(function() {
@@ -420,6 +491,9 @@ function createMediaOptionsWindow(e){
     var $radio1 = $('<input>',{type:"radio",name:"options",value:"panorama",checked:false});
     var $label2;
     var $radio2;
+    
+    console.log("elements in media "+media.length);
+    
     var elements = $('.media-opt');
     
     if(e.val()=="1")

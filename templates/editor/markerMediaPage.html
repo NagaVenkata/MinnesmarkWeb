@@ -13,6 +13,7 @@
     <script src="/static/editor/javascript/jquery-ui-1.10.4.custom.min.js"></script>
     <script type="text/javascript" src="/static/editor/javascript/general.js"></script>
     <script type="text/javascript" src="/static/editor/javascript/markerMediaPage.js"></script>
+    
 
 {% endblock %}
 
@@ -44,8 +45,8 @@
                 <div class="rowfixfull clearfix">
                     <div class="startmedia-wrapper" id="{{cur_route.id}}">
 
-                        <div class="top-bar clearfix">
-                            <button class="btn close" onclick = "location.href='/editor/media/{{cur_route.id}}/'">Avbryt</button>
+                        <div class="top-bar clearfix">  <!--  "location.href='/editor/media/{{cur_route.id}}/'"-->
+                            <button class="btn close" onclick ="exit()">Avbryt</button>
                             <div class="header-text">
                                 <h3>{{marker_name}}</h3>
                                 <p class="small-text">Dra för att ändra ordning.</p>
