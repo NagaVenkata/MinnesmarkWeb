@@ -3,7 +3,7 @@ $('document').ready(function(){
     var page = url.match(/\/editor\/(\w+)/)[1];
 
     //Really, REALLY, ugly solutions, but it works.....
-    if (page == "general") {
+    /*if (page == "general") {
 	document.getElementById("general").className = "editor-btn active";
 	document.getElementById("stations").className = "editor-btn";
 	document.getElementById("media").className = "editor-btn";
@@ -32,5 +32,8 @@ $('document').ready(function(){
 	document.getElementById("stations").className = "editor-btn";
 	document.getElementById("media").className = "editor-btn";
 	document.getElementById("publish").className = "editor-btn";
-    }
+    }*/
+
+    console.log(routes);
+
 });

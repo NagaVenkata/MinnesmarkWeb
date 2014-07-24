@@ -500,8 +500,7 @@ define(function () {
         
         //alert("Entered ");
         
-        
-        
+
         /*for(var i = 0; i < load_polylines.length;i++ ){
             var linePos = new google.maps.LatLng(load_polylines[i].latitude,load_polylines[i].longitude);
             alert("polylines  "+load_polylines[i].latitude+"  "+load_polylines[i].longitude+"  "+load_polylines[i].index);
