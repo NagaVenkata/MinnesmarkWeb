@@ -53,8 +53,6 @@ def render_page_general(request,route_id):
     route = validateRoute(route_id,request.user)
     if route is False:
         return HttpResponseRedirect('/editor')
-    
-    
 
     route_name = route.name
     #If POST request to page
@@ -110,9 +108,10 @@ def render_page_media(request,route_id):
 
     if route.user == request.user or request.user.is_superuser:
         stations = Station.objects.filter(route=route)
+
         return render_to_response('editor/media.html',
                                   {'routes': routes,
-                                   'cur_route':route,
+                                   'cur_route':route_id,
                                    'stations':stations},
                               context_instance=RequestContext(request))
     else:
