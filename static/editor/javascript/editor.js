@@ -58,7 +58,7 @@ $('document').ready(function(){
     
     
     
-    console.log(elements.length);
+    //console.log(elements.length);
     
     if(elements.length>=1) {
     	for(var i=0;i<elements.length;i++) {
@@ -459,9 +459,17 @@ function publishTrail() {
 	var request = $.ajax({
 		url: "/editor/publish/"+$("input[name='publish']").val()+"/",
         type: "GET",
+        contentType:'application/pdf',
         success: function(res){
             console.log("SUCCESS");
-            
+            //console.log(res);
+            //var pdf = window.open();
+            //window.document.write(res);
+            //window.print()
+            var pdf = new Object();
+            pdf = res;
+            console.log(pdf);
+            pdf.print();
             //alert("Hi");
             //console.log(res);
          }

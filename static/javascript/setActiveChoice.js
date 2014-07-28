@@ -34,6 +34,6 @@ $('document').ready(function(){
 	document.getElementById("publish").className = "editor-btn";
     }*/
 
-    console.log(routes);
+    //console.log(routes);
 
 });

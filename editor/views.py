@@ -296,9 +296,19 @@ def render_page_publish(request,route_id):
     if request.is_ajax():
         print("ajax request")
         if(request.method=="GET"):
-            c = canvas.Canvas("/Users/Umapathi/Desktop/text.pdf")
+            response = HttpResponse(content_type='application/pdf')
+            response['Content-Disposition'] = 'inline; filename="markers.pdf"'
+            #c = canvas.Canvas("/Users/Umapathi/Desktop/text.pdf")
+            c = canvas.Canvas("/Users/Umapathi/Desktop/MinnesmarkWeb/static/temp/Umapathi/markers.pdf")
+            c.drawImage("/Users/Umapathi/Desktop/MinnesmarkWeb/static/globalmarkers/pattern1.png",200,400)
             c.drawString(100,200,"Minnesmark Editor")
+            print(c._pagesize)
+            c.showPage()
+            c.drawImage("/Users/Umapathi/Desktop/MinnesmarkWeb/static/globalmarkers/pattern2.png",200,400)
+            c.drawString(100,200,"Minnesmark Editor Page2")
+            c.showPage()
             c.save()
+            return response
         if(request.method=="POST"):
             response_data = {}
             try:
