@@ -30,7 +30,6 @@ $('document').ready(function(){
                 $(this).removeClass('active');
                 $(this).find('.typcn-chevron-right').removeClass('rotate90');
             });
-
             $(".tour-menu").each(function() {
                 $(this).slideUp();
             });
@@ -55,11 +54,9 @@ $('document').ready(function(){
     
     media = elements;
     
-    
-    
-    
     //console.log(elements.length);
     
+
     if(elements.length>=1) {
     	for(var i=0;i<elements.length;i++) {
     	option = elements[i].value;
