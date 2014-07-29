@@ -742,33 +742,54 @@ def save_route_to_database(request):
     #Save all stations
 
     try:
-
+        test = []
         for s in json_obj["stations"]:
-            station = Station(route=route,
+            alreadyExist = False
+            for x in test:
+                if s["index"] == x:
+                    alreadyExist = True
+            test.append(s["index"])
+
+            if alreadyExist:
+                print("Station already exist")
+            else:
+                station = Station(route=route,
                               number=s["number"],
                               index=s["index"])
-            station.save()
+                station.save()
     except:
         response_data['result'] = 'failed'
         response_data['message'] = 'Kunde inte spara markörer'
     #Save positoins on polyline
+
     try:
+        test = []
         for point in json_obj["points"]:
-            point = Polyline(route=route,
-                           latitude=point["latitude"],
-                           longitude=point["longitude"],
-                           index=point["index"],
-                           radius = point["radius"],
-                           shouldDisplayOnCompass = point["shouldDisplayOnCompass"],
-                           swingPoint = point["swingPoint"])
-            point.save()
+            alreadyExist = False
+            for x in test:
+                if point["index"] == x:
+                    alreadyExist = True
+            test.append(point["index"])
+
+            if alreadyExist:
+                print("Swingpoint already exist")
+            else:
+            #print(point)
+                point = Polyline(route=route,
+                                 latitude=point["latitude"],
+                                 longitude=point["longitude"],
+                                 index=point["index"],
+                                 radius = point["radius"],
+                                 shouldDisplayOnCompass = point["shouldDisplayOnCompass"],
+                                 swingPoint = point["swingPoint"])
+                point.save()
+
         response_data['result'] = 'ok'
         response_data['message'] = 'Rutten sparades'
     except ValidationError as e:
         print(e.args) 
         response_data['result'] = 'failed'
         response_data['message'] = 'Kunde inte spara punkter'
-
 
     return HttpResponse(json.dumps(response_data), content_type="application/json")
 
