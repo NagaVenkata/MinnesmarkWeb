@@ -25,11 +25,11 @@
   <body>
     <div class="container">
       <div class="row clearfix">
-        <div class="column third">
+        <div class="column third" id="menuDiv">
           {% include 'editor/editormenu.html' %}
           {% include 'editor/route_menu.html' %}
         </div>
-        <div class="column two-thirds">
+        <div class="column two-thirds" id="contentDiv">
           <div id="map-wrapper">
 	    {% include 'editor/headline.html' %}
 	    {% block content %}{% endblock %}

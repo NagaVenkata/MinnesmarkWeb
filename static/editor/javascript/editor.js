@@ -113,12 +113,13 @@ $('document').ready(function(){
     $('#hideMenu').on('click', function(){
 	if (document.getElementById("contentDiv").className == "column two-thirds") {
 	    document.getElementById("menuDiv").style.display = 'none';
-	    document.getElementById("contentDiv").className = "column half";
+	    document.getElementById("contentDiv").className = "column full";
+	    document.getElementById("map-wrapper").style.width = "100%";
 	}
 	else {
-	    //document.getElementById("menuDiv").className = "column third";
 	    document.getElementById("menuDiv").style.display = 'block';
 	    document.getElementById("contentDiv").className = "column two-thirds";
+	    document.getElementById("map-wrapper").removeAttribute("style");;
 	}
     });
 });
