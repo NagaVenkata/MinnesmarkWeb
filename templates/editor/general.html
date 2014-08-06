@@ -25,7 +25,7 @@
       {% endif %}
       <div class="tour-name-wrapper">
         <label for="tour-name">Namn:</label>
-        <input id="tour-name" type="text" name="tour-name" value="{{ cur_route_name }}"/>
+        <input id="tour-name" type="text" name="tour-name" value="{{ cur_route_name }}" onchange="saveName();"/>
       </div>
       <div class="startmedia-wrapper">
         <h3>Startmedia:</h3>

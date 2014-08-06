@@ -70,7 +70,7 @@ define(function () {
     };
 
     my.initializeEditor = function(){
-	console.log("bfhfhksrebvbgvkdr");
+	//console.log("bfhfhksrebvbgvkdr");
         mapLoaded = false;
 	mapIsSet = false;
         browserSupportFlag =  new Boolean();
@@ -235,6 +235,7 @@ define(function () {
                 }
                 editorSaved = false;
             }
+	    saveRoute();
         });
 
 	// Check if the swing point/station is in a valid position
@@ -345,6 +346,7 @@ define(function () {
             if(stations.length > 1) {
                 collisionControll(station.pathIndex,true);
             }
+	    saveRoute();
         });
 
 	// Popup a option window
@@ -567,6 +569,17 @@ define(function () {
 
 
     };
+
+
+    saveRoute = function() {
+	console.log("inne");
+	require(["/static/editor/javascript/mmEditor.js","/static/editor/javascript/mmSaveAndLoadRoute.js"],
+		function(mmEditor,mmSaveAndLoadRoute) {
+		    console.log("sparar");
+		    mmEditor.saveEditor();
+		    mmSaveAndLoadRoute.saveToDatabase(mmEditor.getStations(),mmEditor.getPath());
+		});
+    }
 
   return my;
 }());

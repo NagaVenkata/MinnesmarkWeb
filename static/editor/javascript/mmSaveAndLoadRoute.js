@@ -218,7 +218,7 @@ define(function(){
         });
         var route_data = {};
         var inputv = $('#tour-name').val();
-	console.log(inputv);
+	//console.log(inputv);
         if(inputv.length > 0){
 
             route_data["name"] = $('#tour-name').val();
