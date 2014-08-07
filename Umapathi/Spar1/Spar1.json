@@ -1,0 +1,114 @@
+[
+    {
+        "attributes": {
+            "ledTitle": "Spar1"
+        }, 
+        "name": "Title", 
+        "type": "title"
+    }, 
+    {
+        "actions": {
+            "application-launched": [
+                "Start"
+            ]
+        }, 
+        "name": "launch", 
+        "type": "generic"
+    }, 
+    {
+        "actions": {
+            "application-start": [
+                "Marker1", 
+                "Marker2"
+            ]
+        }, 
+        "name": "Start", 
+        "type": "start"
+    }, 
+    {
+        "attributes": {
+            "numCollectItems": 0
+        }, 
+        "name": "NumberOfCollectItems", 
+        "type": "NumberOfCollectItems"
+    }, 
+    {
+        "actions": {
+            "marker-found": [
+                "MarkerUnDetect", 
+                "marker1_Image1"
+            ]
+        }, 
+        "attributes": {
+            "collectItem": false, 
+            "markerName": "patt.marker1", 
+            "markerSize": 12484, 
+            "name": "Marker1"
+        }, 
+        "name": "Marker1", 
+        "type": "marker"
+    }, 
+    {
+        "actions": {
+            "image-disappeared": [
+                "marker1_Audio2"
+            ]
+        }, 
+        "attributes": {
+            "collectItem": false, 
+            "heigth": 48, 
+            "imageName": "search.png", 
+            "imageSize": 992, 
+            "width": 48
+        }, 
+        "name": "marker1_Image1", 
+        "type": "image"
+    }, 
+    {
+        "actions": {
+            "audio-finished-playing": [
+                "marker1_Image3"
+            ]
+        }, 
+        "attributes": {
+            "collectItem": false, 
+            "fileSize": 385086, 
+            "filename": "instruktion_station1_vedtrad2.aiff"
+        }, 
+        "name": "marker1_Audio2", 
+        "type": "audio"
+    }, 
+    {
+        "actions": {
+            "image-disappeared": [
+                "MarkerDetect", 
+                "Done"
+            ]
+        }, 
+        "attributes": {
+            "collectItem": false, 
+            "heigth": 390, 
+            "imageName": "cycle-frame.jpg", 
+            "imageSize": 52095, 
+            "width": 600
+        }, 
+        "name": "marker1_Image3", 
+        "type": "image"
+    }, 
+    {
+        "attributes": {
+            "markerName": "patt.marker2", 
+            "markerSize": 12484, 
+            "modelName": "camera.obj"
+        }, 
+        "name": "Marker2", 
+        "type": "marker"
+    }, 
+    {
+        "actions": {
+            "application-done": []
+        }, 
+        "name": "Done", 
+        "type": "done"
+    }
+]

@@ -1,6 +1,9 @@
+# -*- coding: utf-8 -*-
 import json
 import os
 import decimal
+from django.utils.encoding import smart_str
+import codecs
 from django.contrib.auth.models import User
 from django.contrib.redirects.models import Redirect
 from django.http import HttpResponse, HttpResponseRedirect
@@ -9,6 +12,8 @@ from django.contrib.auth.decorators import login_required
 from django.template import RequestContext
 from django.core.exceptions import ValidationError,NON_FIELD_ERRORS
 from editor import models
+from PIL import Image
+import shutil 
 import editor
 import imghdr
 import sndhdr
@@ -16,7 +21,7 @@ from reportlab.pdfgen import canvas
 from editor.models import Media, Route, Station, Polyline, Marker
 from minnesmark.settings import PROJECT_ROOT
 from editor.jsonObject import TitleEvents
-from editor.jsonObject import Station_SwingPointEvents,MarkerEvent,MediaEvent,Marker_Media
+from editor.jsonObject import Station_SwingPointEvents,MarkerEvent,MediaEvent,ModelEvent,Marker_Media,MinnesmarkObjWriter
 
 # Login_required means that the user has to be looged in to see that specific page
 
@@ -101,14 +106,12 @@ def render_page_media(request,route_id):
 
     route = validateRoute(route_id,request.user)
     
-    
-    
     if route is False:
         return HttpResponseRedirect('/editor')
 
     if route.user == request.user or request.user.is_superuser:
         stations = Station.objects.filter(route=route)
-
+        
         return render_to_response('editor/media.html',
                                   {'routes': routes,
                                    'cur_route':route_id,
@@ -170,11 +173,13 @@ def render_page_marker(request,route_id,marker_id):
             print(media.options)
             print(media.id)
             try:
-                print(Media.PANORAMA)           
+                #print(Media.PANORAMA)           
                 media.options = request.GET['type']
                 media.save()
                 media_object = Media.objects.filter(id=request.GET['id'],route=route,marker=marker_object[0])
-                print(media_object[0].options)
+                print("media options "+str(media_object[0].options))
+                if(media_object[0].options == 2):
+                    writeObjFile(media_object[0].filepath,request,route_id,media_object[0].filename)
             except ValidationError as e:
                 print(e.args)
             
@@ -237,6 +242,109 @@ def render_page_marker(request,route_id,marker_id):
                               context_instance=RequestContext(request))
     else:
         redirect('/account/login')
+
+def writeObjFile(fileName,request,route_id,name):
+    print(fileName)
+    
+    path = PROJECT_ROOT
+    os.chdir(path)
+    
+    os.chdir('..')
+    
+    try:
+        #if User hasen't uploaded anything yet, create folder
+        os.mkdir(request.user.username+"/")
+    except:
+        pass
+    
+    route = Route.objects.filter(id=route_id)
+    
+    os.chdir(request.user.username)
+    
+    try:
+        #get the route name and make a directory with that name
+        if(route[0].name!="Ny Route"):
+            os.mkdir(route[0].name)
+            os.chdir(route[0].name)
+        else:
+            os.mkdir(route[0].id)
+            os.chdir(route[0].id)
+    except:
+        pass
+    
+    if(route[0].name!="Ny Route"):
+        os.chdir(route[0].name)
+    else:
+        os.chdir(route[0].id)
+        
+    print(os.getcwd())
+    
+    try:
+        os.mkdir('osg_obj')
+        os.chdir('osg_obj')
+    except:
+        pass
+    
+    
+    print(os.getcwd())
+    #folder = os.getcwd()
+
+
+    #change to user folder
+    #os.chdir(folder + '/osg_obj/')
+    
+    desPath = os.getcwd() 
+    
+    print("despath1 "+desPath)
+    
+    shutil.copy(fileName,desPath+"/osg_obj/")
+    
+    
+    
+    img = Image.open(desPath+'/osg_obj/'+name)
+    
+    width=0
+    height=0
+    
+    if(img.size[0]<256):
+        width=256
+    
+    if(img.size[1]<256):
+        height=256
+    
+    if(img.size[0]<350):
+        width=256
+    
+    if(img.size[1]<350):
+        height=256
+        
+    if(img.size[0]>350 and img.size[0]<512):
+        width=512
+    
+    if(img.size[1]>350 and img.size[1]<512):
+        height=512
+        
+    if(img.size[0]>512):
+        width=512
+    
+    if(img.size[1]>512):
+        height=512
+    
+    print("despath "+desPath)
+    
+    texturefile = os.path.splitext(name)[0]+".jpg"
+    
+    print("texture name "+texturefile)
+       
+    if((width != 0) and (height != 0)):
+        print(str(width)+" "+str(height))   
+        img1 = img.resize((width,height),Image.ANTIALIAS)
+        img1.save(desPath+'/osg_obj/'+texturefile)
+        
+    
+    MinnesmarkObjWriter(texturefile,desPath+'/osg_obj/')   
+   
+    
         
 def save_marker_to_database(request,route_id,marker_id):
     print(route_id)
@@ -272,7 +380,7 @@ def save_marker_to_database(request,route_id,marker_id):
             #Marker.objects.filter(route = route).delete()
             marker = Marker(route=route,
                             index = marker_id,
-                            name = "Marker"+str(marker_id),
+                            name = "marker"+str(marker_id),
                             markerName = "patt.marker"+str(marker_id),
                             type = "marker",
                             markerSize = filesize,
@@ -294,20 +402,41 @@ def render_page_publish(request,route_id):
         return HttpResponseRedirect('/editor')
     if request.is_ajax():
         print("ajax request")
+        response_data= {}
         if(request.method=="GET"):
-            response = HttpResponse(content_type='application/pdf')
-            response['Content-Disposition'] = 'inline; filename="markers.pdf"'
+            #response = HttpResponse(content_type='application/pdf')
+            #response['Content-Disposition'] = 'inline; filename="markers.pdf"'
             #c = canvas.Canvas("/Users/Umapathi/Desktop/text.pdf")
+            markers = []
+    
+            #for each marker get the media associated with it
+            for m in Marker.objects.filter(route=route):
+                marker = Marker_Media(m.name) 
+                for media in Media.objects.filter(route=route,marker=m,user=request.user).order_by('order'):
+                    marker.setMarkerMedia(media.as_json())
+                markers.append(marker)
             c = canvas.Canvas("/Users/Umapathi/Desktop/MinnesmarkWeb/static/temp/Umapathi/markers.pdf")
-            c.drawImage("/Users/Umapathi/Desktop/MinnesmarkWeb/static/globalmarkers/pattern1.png",200,400)
-            c.drawString(100,200,"Minnesmark Editor")
-            print(c._pagesize)
-            c.showPage()
-            c.drawImage("/Users/Umapathi/Desktop/MinnesmarkWeb/static/globalmarkers/pattern2.png",200,400)
-            c.drawString(100,200,"Minnesmark Editor Page2")
-            c.showPage()
+            i=1
+            
+            for marker in markers:
+                c.drawImage("/Users/Umapathi/Desktop/MinnesmarkWeb/static/globalmarkers/pattern"+str(i)+".png",200,400)
+                num_media = len(marker.getMarkerMedia())-1
+                media = "Media:"
+                for j in range(0,len(marker.getMarkerMedia())-1):
+                    print(marker.getMarkerMedia()[j])
+                    media = media+marker.getMarkerMedia()[j]['name']+","
+                media = media+marker.getMarkerMedia()[num_media]['name']
+                c.drawString(100,200,media)
+                #print(c._pagesize)
+                c.showPage()
+                i=i+1
+            #c.drawImage("/Users/Umapathi/Desktop/MinnesmarkWeb/static/globalmarkers/pattern2.png",200,400)
+            #c.drawString(100,200,"Minnesmark Editor Page2")
+            #c.showPage()
             c.save()
-            return response
+            print(request.user)
+            response_data['pdf_url'] = '/static/temp/'+str(request.user)+'/markers.pdf'
+            return HttpResponse(json.dumps(response_data), content_type="application/json")
         if(request.method=="POST"):
             response_data = {}
             try:
@@ -364,35 +493,99 @@ def publish_trail(request,route_id):
     
     attrib.append(title.asJson())
     
-    title.writeEvent("NumberOfRegions","numRegions", len(stations))
-    attrib.append(title.asJson())
+    num_stations = 0
+    
+    for s in Station.objects.filter(route=route):
+        # marker = Marker_Media(m.name) 
+        media =  Media.objects.filter(route=route,station=s,user=request.user).order_by('order')
+        if(len(media)>0):
+            num_stations = num_stations+1 
+        
+
+    if(num_stations>0):
+        title.writeEvent("NumberOfRegions","numRegions", len(stations))
+        attrib.append(title.asJson())
+    
+    actions = ["Start"]
+    title.writeEventActions("launch","generic","application-launched",actions)
+    attrib.append(title.asJsonAction())
+    
+    markers1 = [ ]
+    
+    num_markers = [ ]
+    
+    for m in Marker.objects.filter(route=route):
+        marker = Marker_Media(m.name) 
+        for media in Media.objects.filter(route=route,marker=m,user=request.user).order_by('order'):
+            marker.setMarkerMedia(media.as_json)
+        num_markers.append(marker)
+    
+    for markers_media in num_markers:
+        if(len(markers_media.getMarkerMedia())>0):
+            markers1.append(markers_media.getMarkerName()) 
+    
+    title.writeEventActions("Start","start","application-start",markers1)
+    attrib.append(title.asJsonAction())
+    
+    collectItems = 0 
+    #collect items for markers
+    for m in Marker.objects.filter(route=route):
+        marker = Marker_Media(m.name) 
+        for media in Media.objects.filter(route=route,marker=m,user=request.user):
+            if(media.treasure==True):
+                collectItems = collectItems+1
+                
+    title.writeEvent("NumberOfCollectItems","numCollectItems",collectItems)
+    attrib.append(title.asJson())        
     
     #attrib.append(attr)
     #attrib.append(attr1)
-    station = Station_SwingPointEvents(route)
-    for p in points:
-        station.PolylineIndex(p)
-        attrib.append(station.as_json())
+    if(num_stations>0):
+        station = Station_SwingPointEvents(route)
+        for p in points:
+            station.PolylineIndex(p)
+            attrib.append(station.as_json())
     
-    markerEvent = MarkerEvent(route)
+#     markerEvent = MarkerEvent(route)
+#     
+#     for marker in markers:
+#         marker_media = Media.objects.filter(route=route,marker=marker)
+#         if(len(marker_media)!=0):
+#             markerEvent.markersIndex(marker,marker_media[0])
+#             attrib.append(markerEvent.as_json())
+            
+    writeMarkerEvent = True
     
-    for marker in markers:
-        marker_media = Media.objects.filter(route=route,marker=marker)
-        if(len(marker_media)!=0):
-            markerEvent.markersIndex(marker,marker_media[0])
-            attrib.append(markerEvent.as_json())
+    marker_count = 1
             
     for marker in markers:
         marker_media = Media.objects.filter(route=route,marker=marker)
         if(len(marker_media)!=0):
             for media in marker_media:
-                mediaEvent = MediaEvent(media)
-                mediaEvent.mediaIndex(media)
-                attrib.append(mediaEvent.as_json())
+                if(media.options!=2):
+                    if(writeMarkerEvent):
+                        markerEvent = MarkerEvent(route)
+                        markerEvent.markersIndex(marker,marker_media[0])
+                        attrib.append(markerEvent.as_json())
+                        writeMarkerEvent = False
+                        writeMarkerFiles(marker.name,marker_count,request.user,route_id)
+                        marker_count = marker_count+1
+                        
+                    mediaEvent = MediaEvent(media)
+                    mediaEvent.mediaIndex(media)
+                    attrib.append(mediaEvent.as_json())
+                else:
+                    writeMarkerFiles(marker.name,marker_count,request.user,route_id)
+                    marker_count = marker_count+1
+                    modelEvent = ModelEvent(marker,media)
+                    attrib.append(modelEvent.as_json())
+                    
+        writeMarkerEvent = True
                 
-           
+    title.writeEventActions("Done","done","application-done",None)
+    attrib.append(title.asJsonAction())      
     
-    print(json.dumps(attrib))
+    print(json.dumps(attrib,ensure_ascii=False))
     
     path = PROJECT_ROOT
     os.chdir(path)
@@ -404,27 +597,110 @@ def publish_trail(request,route_id):
 
     try:
         #if User hasen't uploaded anything yet, create folder
-        os.mkdir("json" + '/')
+        os.mkdir(request.user.id + '/')
     except:
         pass
 
+   
     #change to user folder
-    os.chdir("json")
+    os.chdir(request.user.username)
+    
+    
+    if(route.name!="Ny Route"):
+        os.chdir(route.name)
+    else:
+        os.chdir(route.id)
+        
+    print(os.getcwd())
+    
     folder = os.getcwd()
 
     #Fullpath to file
-    fullpath = folder + "/" + "tex.json"
+    fullpath = folder + "/" +route.name+".json"
     
     
 
     #Try to create file
     try:
-        with open(fullpath, 'w') as f:
-            json.dump(attrib, f,sort_keys = True, indent = 4, ensure_ascii=True)
-    except:
+        with open(fullpath, 'w+',encoding='utf-8') as f:
+            json.dump(attrib,f,sort_keys = True, indent = 4,ensure_ascii=False)
+    except ValidationError as e:
+        print(e.args)
         return False
     
+        
+def writeMarkerFiles(markerName,marker_id,user,route_id):
     
+    path = PROJECT_ROOT
+    os.chdir(path)
+    # Move up one
+    os.chdir('..')
+    
+    folder = os.getcwd()
+    
+    patternPath = folder+"/static/globalmarkers/patt.marker"+str(marker_id)
+
+    markerPath = folder + "/static/globalmarkers/pattern"+str(marker_id)+".png"
+    
+    #path = PROJECT_ROOT
+    #os.chdir('..')
+    
+    print("markers write "+os.getcwd())
+    
+    try:
+        #if User hasen't uploaded anything yet, create folder
+        os.mkdir(user.username+"/")
+    except:
+        pass
+    
+    route = Route.objects.filter(id=route_id)
+    
+    os.chdir(user.username)
+    
+    try:
+        #get the route name and make a directory with that name
+        if(route[0].name!="Ny Route"):
+            os.mkdir(route[0].name)
+            os.chdir(route[0].name)
+        else:
+            os.mkdir(route[0].id)
+            os.chdir(route[0].id)
+    except:
+        pass
+    
+    if(route[0].name!="Ny Route"):
+        os.chdir(route[0].name)
+    else:
+        os.chdir(route[0].id)
+        
+    print(os.getcwd())
+    
+    
+    try:
+        os.mkdir('markers')
+        os.chdir('markers')
+    except:
+        os.chdir('markers')
+        pass
+    
+    
+    print(os.getcwd())
+    #folder = os.getcwd()
+
+
+    #change to user folder
+    #os.chdir(folder + '/osg_obj/')
+    
+    desPath = os.getcwd() 
+    
+    print(desPath)
+    
+    
+    shutil.copy(patternPath,desPath)
+    shutil.copy(markerPath,desPath)
+
+    
+
     
 # /editor/media/<route_id>/station/<station_id>
 # NOT DONE IN URL !!!!!
@@ -809,15 +1085,17 @@ def save_route_name_to_db(request):
 # @param user_id ID of user
 def delete_media(media_id, user_id,route_id,station_id,marker_id):
     m = Media.objects.get(id=media_id)
+    media = Media.objects.filter(filename=m.filename)
     u = User.objects.get(id=user_id)
     print(m.user)
     print(u)
     
-    
+    print(len(media))
     
     #Only delete if you uploaded or if you are admin
     if m.user.id == u.id or u.is_superuser:
-        os.remove(m.filepath)
+        if(len(media)==1):
+            os.remove(m.filepath)
         m.delete()
                 
             

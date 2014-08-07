@@ -23,7 +23,7 @@ $('document').ready(function(){
             If Not has Active class, Hide all tour-menus
             and display the clicked one
          */
-
+    	
         if(!$(this).hasClass('active')){
 	    document.location.pathname = "editor/general/" + $(this)[0].id;
             $(".tour-list li").each(function() {
@@ -56,7 +56,7 @@ $('document').ready(function(){
     
     //console.log(elements.length);
     
-
+    
     if(elements.length>=1) {
     	for(var i=0;i<elements.length;i++) {
     	option = elements[i].value;
@@ -69,6 +69,15 @@ $('document').ready(function(){
     	}
     } 	
     
+    
+    
+    /*$('.media-files').on("sortchange",function(event,ui){
+    	
+    	console.log(event);
+    	console.log(ui);
+    	$( '.media-files' ).sortable( "refreshPositions" );
+    	
+    });*/
     
     
     
@@ -465,12 +474,78 @@ function publishTrail() {
             //window.print()
             var pdf = new Object();
             pdf = res;
-            console.log(pdf);
-            pdf.print();
+            console.log(res.pdf_url);
+            //window.document.write(res);
+            //window.document.close();
+            //console.log(pdf);
+            //pdf.print();
+            /*var pdfContent = $("#pdf").parent();
+            var newPdf = "<embed src='/static/temp/Umapathi/markers.pdf' id='pdf'>";
+            $("#pdf").remove();
+            pdfContent.append(newPdf);
+            pdfContent.print();*/
+            
+            /*var pdf = ["/static/temp/Umapathi/markers.pdf"];
+            
+            var pdfWindow = new Array();
+            
+            pdfWindow = window.open(pdf);
+            pdfWindow.print();*/
+            
+            
+            
+            
+            
+            //console.log($("#pdf"));
+            
+            /*$('#pdf').attr('src','/static/temp/Umapathi/markers.pdf');
+            
+            var printPDF = window.frames["pdf"].focus();
+            window.frames["pdf"].print();
+            
+            
+            //console.log($('#pdf').contents());
+            
+            //printPDF.focus();
+            
+            //var pdfprint = setTimeout(printPDF.print(),50);
+            
+            //window.clearTimeout(pdfprint);
+            
+            //window.print();
+            
+            
+            //printPDF.document.write('<body onload="window.print()">'+$('#pdf').contents()+'</body>');
+            //printPDF.document.close();
+            
+            //console.log($('#pdfContent')) */
+            
+            console.log(window.navigator.userAgent);
+            var curr_browser = window.navigator.userAgent;
+            if(curr_browser.indexOf('Firefox')>-1)
+               window.open(res.pdf_url);
+            else {
+               $('#pdf').attr('src',res.pdf_url);
+               $('#pdfContent').hide();
+            }   
+            
             //alert("Hi");
             //console.log(res);
          }
+	    
+	     
+	
     });
+	
+    var curr_browser = window.navigator.userAgent;
+	
+	if(curr_browser.indexOf('Firefox')<=-1) {
+	   setTimeout(function() {
+		 
+		 var printPDF = window.frames["pdf"].focus();
+		 window.frames["pdf"].print();},500);
+	}   
+
 }
 
 function createMediaOptionsWindow(e){

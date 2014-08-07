@@ -1,4 +1,5 @@
 eclipse.preferences.version=1
+encoding//editor/views.py=utf-8
 encoding//templates/editor/addMedia.html=UTF-8
 encoding//templates/editor/editor.html=UTF-8
 encoding//templates/editor/editormenu.html=UTF-8
