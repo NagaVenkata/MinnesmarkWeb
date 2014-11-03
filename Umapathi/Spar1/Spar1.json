@@ -7,6 +7,20 @@
         "type": "title"
     }, 
     {
+        "attributes": {
+            "numRegions": 2
+        }, 
+        "name": "NumberOfRegions", 
+        "type": "NumberOfRegions"
+    }, 
+    {
+        "attributes": {
+            "showCompassView": true
+        }, 
+        "name": "compassView", 
+        "type": "compassView"
+    }, 
+    {
         "actions": {
             "application-launched": [
                 "Start"
@@ -18,8 +32,13 @@
     {
         "actions": {
             "application-start": [
+                "compassView", 
+                "enableStation1Compass", 
+                "disableStation2Compass", 
+                "disableStation1SwingPoint1Compass", 
+                "disableStation1SwingPoint2Compass", 
                 "Marker1", 
-                "Marker2"
+                "start_Image1"
             ]
         }, 
         "name": "Start", 
@@ -34,9 +53,244 @@
     }, 
     {
         "actions": {
+            "image-disappeared": [
+                "start_Video2"
+            ]
+        }, 
+        "attributes": {
+            "collectItem": false, 
+            "heigth": 32, 
+            "imageName": "logout1.png", 
+            "imageSize": 1078, 
+            "width": 32
+        }, 
+        "name": "start_Image1", 
+        "type": "image"
+    }, 
+    {
+        "actions": {
+            "video-finished-playing": [
+                "start_Image3"
+            ]
+        }, 
+        "attributes": {
+            "collectItem": false, 
+            "fileSize": 3549152, 
+            "filename": "boa7.m4v", 
+            "filetype": [
+                ".m4v"
+            ]
+        }, 
+        "name": "start_Video2", 
+        "type": "video"
+    }, 
+    {
+        "actions": {
+            "image-disappeared": [
+                "start_Image4"
+            ]
+        }, 
+        "attributes": {
+            "collectItem": false, 
+            "heigth": 64, 
+            "imageName": "cycle3.jpg", 
+            "imageSize": 2336, 
+            "width": 64
+        }, 
+        "name": "start_Image3", 
+        "type": "image"
+    }, 
+    {
+        "actions": {
+            "image-disappeared": []
+        }, 
+        "attributes": {
+            "collectItem": false, 
+            "heigth": 48, 
+            "imageName": "search.png", 
+            "imageSize": 992, 
+            "width": 48
+        }, 
+        "name": "start_Image4", 
+        "type": "image"
+    }, 
+    {
+        "actions": {
+            "enter-region": [
+                "disableStation1Compass", 
+                "stationEnterAudio", 
+                "station1_Image1"
+            ]
+        }, 
+        "attributes": {
+            "index": 0, 
+            "latitude": 58.39775965411155, 
+            "longitude": 15.574909461372613, 
+            "radius": 10.0, 
+            "shouldDisplayOnCompass": false, 
+            "swingPoint": false
+        }, 
+        "name": "station1", 
+        "type": "region"
+    }, 
+    {
+        "actions": {
+            "enter-region": [
+                "disableStation2Compass", 
+                "stationEnterAudio", 
+                "station2_Image1"
+            ]
+        }, 
+        "attributes": {
+            "index": 3, 
+            "latitude": 58.398344348664715, 
+            "longitude": 15.574919723643006, 
+            "radius": 10.0, 
+            "shouldDisplayOnCompass": false, 
+            "swingPoint": false
+        }, 
+        "name": "station2", 
+        "type": "region"
+    }, 
+    {
+        "actions": {
+            "enter-region": [
+                "disableStation1SwingPoint1Compass", 
+                "enableStation1SwingPoint2Compass", 
+                "stationEnterAudio"
+            ]
+        }, 
+        "attributes": {
+            "index": 1, 
+            "latitude": 58.39788615132849, 
+            "longitude": 15.574048355637387, 
+            "radius": 10.0, 
+            "shouldDisplayOnCompass": false, 
+            "swingPoint": true
+        }, 
+        "name": "station1_swingpoint1", 
+        "type": "region"
+    }, 
+    {
+        "actions": {
+            "enter-region": [
+                "disableStation1SwingPoint2Compass", 
+                "enableStation2Compass", 
+                "stationEnterAudio"
+            ]
+        }, 
+        "attributes": {
+            "index": 2, 
+            "latitude": 58.398282506698855, 
+            "longitude": 15.574367421868828, 
+            "radius": 10.0, 
+            "shouldDisplayOnCompass": false, 
+            "swingPoint": true
+        }, 
+        "name": "station1_swingpoint2", 
+        "type": "region"
+    }, 
+    {
+        "actions": {
+            "image-disappeared": [
+                "station1_Image2"
+            ]
+        }, 
+        "attributes": {
+            "collectItem": false, 
+            "heigth": 64, 
+            "imageName": "cycle3.jpg", 
+            "imageSize": 2336, 
+            "width": 64
+        }, 
+        "name": "station1_Image1", 
+        "type": "image"
+    }, 
+    {
+        "actions": {
+            "image-disappeared": [
+                "enableStation1SwingPoint1Compass"
+            ]
+        }, 
+        "attributes": {
+            "collectItem": false, 
+            "heigth": 48, 
+            "imageName": "search.png", 
+            "imageSize": 992, 
+            "width": 48
+        }, 
+        "name": "station1_Image2", 
+        "type": "image"
+    }, 
+    {
+        "attributes": {
+            "regionIdentifier": "station1", 
+            "showCompassMarker": true
+        }, 
+        "name": "enableStation1Compass", 
+        "type": "compassmarker"
+    }, 
+    {
+        "attributes": {
+            "regionIdentifier": "station1", 
+            "showCompassMarker": false
+        }, 
+        "name": "disableStation1Compass", 
+        "type": "compassmarker"
+    }, 
+    {
+        "attributes": {
+            "regionIdentifier": "station2", 
+            "showCompassMarker": true
+        }, 
+        "name": "enableStation2Compass", 
+        "type": "compassmarker"
+    }, 
+    {
+        "attributes": {
+            "regionIdentifier": "station2", 
+            "showCompassMarker": false
+        }, 
+        "name": "disableStation2Compass", 
+        "type": "compassmarker"
+    }, 
+    {
+        "attributes": {
+            "regionIdentifier": "station1_swingPoint1", 
+            "showCompassMarker": true
+        }, 
+        "name": "enableStation1SwingPoint1Compass", 
+        "type": "compassmarker"
+    }, 
+    {
+        "attributes": {
+            "regionIdentifier": "station1_swingPoint1", 
+            "showCompassMarker": false
+        }, 
+        "name": "disableStation1SwingPoint1Compass", 
+        "type": "compassmarker"
+    }, 
+    {
+        "attributes": {
+            "regionIdentifier": "station1_swingPoint2", 
+            "showCompassMarker": true
+        }, 
+        "name": "enableStation1SwingPoint2Compass", 
+        "type": "compassmarker"
+    }, 
+    {
+        "attributes": {
+            "regionIdentifier": "station1_swingPoint2", 
+            "showCompassMarker": false
+        }, 
+        "name": "disableStation1SwingPoint2Compass", 
+        "type": "compassmarker"
+    }, 
+    {
+        "actions": {
             "marker-found": [
                 "MarkerUnDetect", 
-                "marker1_Image1"
+                "marker1_Video2"
             ]
         }, 
         "attributes": {
@@ -50,59 +304,36 @@
     }, 
     {
         "actions": {
-            "image-disappeared": [
-                "marker1_Audio2"
+            "video-disappeared": [
+                "MarkerDetect"
             ]
         }, 
         "attributes": {
             "collectItem": false, 
-            "heigth": 48, 
-            "imageName": "search.png", 
-            "imageSize": 992, 
-            "width": 48
+            "fileSize": 3549152, 
+            "filename": "boa7.m4v", 
+            "filetype": [
+                ".m4v"
+            ]
+        }, 
+        "name": "marker1_Video2", 
+        "type": "video"
+    }, 
+    {
+        "actions": {
+            "image-disappeared": [
+                "marker1_Video2"
+            ]
+        }, 
+        "attributes": {
+            "collectItem": false, 
+            "heigth": 32, 
+            "imageName": "camera.png", 
+            "imageSize": 715, 
+            "width": 32
         }, 
         "name": "marker1_Image1", 
         "type": "image"
-    }, 
-    {
-        "actions": {
-            "audio-finished-playing": [
-                "marker1_Image3"
-            ]
-        }, 
-        "attributes": {
-            "collectItem": false, 
-            "fileSize": 385086, 
-            "filename": "instruktion_station1_vedtrad2.aiff"
-        }, 
-        "name": "marker1_Audio2", 
-        "type": "audio"
-    }, 
-    {
-        "actions": {
-            "image-disappeared": [
-                "MarkerDetect", 
-                "Done"
-            ]
-        }, 
-        "attributes": {
-            "collectItem": false, 
-            "heigth": 390, 
-            "imageName": "cycle-frame.jpg", 
-            "imageSize": 52095, 
-            "width": 600
-        }, 
-        "name": "marker1_Image3", 
-        "type": "image"
-    }, 
-    {
-        "attributes": {
-            "markerName": "patt.marker2", 
-            "markerSize": 12484, 
-            "modelName": "camera.obj"
-        }, 
-        "name": "Marker2", 
-        "type": "marker"
     }, 
     {
         "actions": {

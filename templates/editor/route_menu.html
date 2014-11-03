@@ -8,9 +8,13 @@
             {% endif %}
 
                 <span class="typcn typcn-chevron-right see-more"></span>
+                <div id="remove_route" class="btn-block" style="float:right">
+                <button class="btn round orange minus" onclick="removeRoute()"><span class="typcn typcn-document-delete"></span></button>
+                <div class="label-bottom" style="text-align:center" >Radera runda</div>
+                </div>
                 <h2 class="see-more">{{ r.name }}</h2>
                 <p class="small-text">
-                    {% if r.publish %}
+                    {% if r.published %}
                        Publicerad
                     {% else %}
                        Opublicerad
@@ -20,22 +24,22 @@
                 <ul class="tour-menu" id="" + r>
                     <li class="clearfix">
                         <p>1. Bestäm namn och startmedia</p>
-                        <a href="/editor/general/{{ r.id }}" class="editor-btn" id="general"><span class="typcn typcn-chevron-right"></span></a>
+                        <a href="/editor/general/{{ r.id }}" class="editor-btn" id="general"><span class="typcn typcn-chevron-right" style="color:#1dc5f5;"></span></a>
 
                     </li>
                     <li class="clearfix">
                         <p>2. Lägg till stationer på kartan</p>
-                        <a href="/editor/stations/{{ r.id }}" class="editor-btn" id="stations"><span class="typcn typcn-chevron-right"></span></a>
+                        <a href="/editor/stations/{{ r.id }}" class="editor-btn" id="stations"><span class="typcn typcn-chevron-right" style="color:#1dc5f5;"></span></a>
 
                     </li>
                     <li class="clearfix">
                         <p>3. Lägg till media</p>
-                        <a href="/editor/media/{{ r.id }}" class="editor-btn" id="media"><span class="typcn typcn-chevron-right"></span></a>
+                        <a href="/editor/media/{{ r.id }}" class="editor-btn" id="media"><span class="typcn typcn-chevron-right" style="color:#1dc5f5;"></span></a>
 
                     </li>
                     <li class="clearfix">
                         <p>4. Publicera, skriv ut och färdigställ</p>
-                        <a href="/editor/publish/{{ r.id }}" class="editor-btn" id="publish"><span class="typcn typcn-chevron-right"></span></a>
+                        <a href="/editor/publish/{{ r.id }}" class="editor-btn" id="publish"><span class="typcn typcn-chevron-right" style="color:#1dc5f5;"></span></a>
                     </li>
                 </ul>
             </li>

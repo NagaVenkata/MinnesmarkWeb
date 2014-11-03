@@ -32,7 +32,8 @@ class Polyline(models.Model):
     longitude = models.DecimalField(max_digits=30, decimal_places=25)
     radius = models.DecimalField(max_digits=4, decimal_places=2)
     shouldDisplayOnCompass = models.BooleanField()
-    swingPoint = models.BooleanField()     
+    swingPoint = models.BooleanField()    
+    stationIndex = models.IntegerField() 
     
     print(radius)       
     
@@ -68,7 +69,8 @@ class Marker(models.Model):
 # Media tables
 class Media(models.Model):
     route = models.ForeignKey(Route)
-    station = models.ForeignKey(Station, null=True)
+    #station = models.ForeignKey(Station, null=True)
+    station_id = models.IntegerField()
     marker = models.ForeignKey(Marker,null=True)
     filename = models.CharField(max_length=40)
     filepath = models.CharField(max_length=256)

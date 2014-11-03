@@ -23,20 +23,20 @@
       <h3 class="error">{{ msg }}</h3>
       {% endif %}
       <div class="tour-name-wrapper">
-        <label for="tour-name">Namn:</label>
-        <input id="tour-name" type="text" name="tour-name" value="{{ cur_route_name }}"/>
+        <label for="tour-name" style="margin-left:1em;">Namn:</label> <!-- ;color:#1dc5f5; -->
+        <input id="tour-name" type="text" name="tour-name" value="{{ cur_route_name }}" onchange="saveName();"/>
       </div>
-      <div class="startmedia-wrapper">
+      <div class="startmedia-wrapper" id="{{cur_route}}">
         <h3>Startmedia:</h3>
-        <p class="small-text">Dra för att ändra ordning.</p>
+        <p class="small-text" style="margin-left:1em;">Dra för att ändra ordning.</p>
         <ul class="media-files" id="addLi">
           {% for m in start_media %}
-          <li class="clearfix">
+          <li class="clearfix" onmouseup="myVar = setTimeout(resetMedia,1500)">
             <span class="typcn typcn-arrow-unsorted"></span>
 
-            <button class="media-opt btn round"><span class="typcn typcn-info-large"></span></button>
+            <button class="media-opt btn round"  id="{{m.name}}" name="{{ m.id }}" value="{{m.options}}"><span class="typcn typcn-info-large"></span></button>
             <p>{{ m.name }}</p>
-            <form action="" method="post">
+            <form action="" method="post" onsubmit="return getMediaRemoveConfirm();">
               {% csrf_token %}
               <input type="hidden" name="delmedia" value="{{ m.id }}">
               <button class="btn round orange minus"><span class="typcn typcn-minus"></span></button>

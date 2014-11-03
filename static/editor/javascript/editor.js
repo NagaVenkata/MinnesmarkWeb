@@ -3,6 +3,8 @@
  */
 var media=0;
 var newMedia=null;
+var contents = null;
+var printmap = null;
 
 //require('/static/editor/javascript/build/pdfmake.js');
 
@@ -12,10 +14,15 @@ $('document').ready(function(){
      */
 	
 	
+	
+	$("#remove_route").hide();
+	
+	
     $('.tour-list li').each(function(){
         if($(this).hasClass('active')){
-            $(this).find('.tour-menu').show();
+        	$(this).find('.tour-menu').show();
             $(this).find('.typcn-chevron-right').addClass('rotate90');
+            $("#remove_route").show();
         }
     })
     $('.tour-list li').on('click',function(e){
@@ -23,9 +30,11 @@ $('document').ready(function(){
             If Not has Active class, Hide all tour-menus
             and display the clicked one
          */
-    	
-        if(!$(this).hasClass('active')){
+    	if(!$(this).hasClass('active')){
+    		
 	    document.location.pathname = "editor/general/" + $(this)[0].id;
+	    
+	        
             $(".tour-list li").each(function() {
                 $(this).removeClass('active');
                 $(this).find('.typcn-chevron-right').removeClass('rotate90');
@@ -45,6 +54,7 @@ $('document').ready(function(){
             $(this).find('.tour-menu').slideUp();
             $(this).removeClass('active');
             $(this).find('.typcn-chevron-right').removeClass('rotate90');
+            $("#remove_route").hide();
         }
     });
     
@@ -65,25 +75,15 @@ $('document').ready(function(){
         	
     		elements[i].disabled = true;
         	
-          }
+          } else
+        	  elements[i].disabled = false;
     	}
     } 	
     
     
-    
-    /*$('.media-files').on("sortchange",function(event,ui){
-    	
-    	console.log(event);
-    	console.log(ui);
-    	$( '.media-files' ).sortable( "refreshPositions" );
-    	
-    });*/
-    
-    
-    
-    
     $('.media-opt').on('click',function(){
-        createMediaOptionsWindow($(this));
+    	
+    	createMediaOptionsWindow($(this));
     });
 
     //function is called when clicked on add media button
@@ -103,36 +103,247 @@ $('document').ready(function(){
     });
     
     //function called when clicked on publish a trial
-    $("input[name='publish']").on('click',function(){
+    /*$("input[name='publish']").on('click',function(){
     	
     	//var w = window.open("about:blank");
     	//w.document.write("/Users/Umapathi/Desktop/text.pdf");
     	//w.print();
     	publishJsonFile($(this));
     	$("input[name='publish']").prop('disabled',true);	
-     });
-    
-    
-    $('#print').on('click',function(){
-    	
-    	publishTrail();
-    });
-    
+     });*/
+   
    
     $('#hideMenu').on('click', function(){
 	if (document.getElementById("contentDiv").className == "column two-thirds") {
 	    document.getElementById("menuDiv").style.display = 'none';
-	    document.getElementById("contentDiv").className = "column half";
+	    document.getElementById("contentDiv").className = "column full";
+	    document.getElementById("map-wrapper").style.width = "100%";
 	}
 	else {
-	    //document.getElementById("menuDiv").className = "column third";
 	    document.getElementById("menuDiv").style.display = 'block';
 	    document.getElementById("contentDiv").className = "column two-thirds";
+	    document.getElementById("map-wrapper").removeAttribute("style");;
 	}
     });
 });
 
+
+function getMediaRemoveConfirm() {
+	
+	var removeMedia = confirm("Vill du verkligen ta bort mediefilen?");
+	
+	if(removeMedia==true) {
+		
+		return true;
+	}
+	else {
+		
+		return false;
+	}
+}
+
+//remove the route
+function removeRoute() {
+	
+    var removeMedia = confirm("Vill du verkligen ta bort runden?");
+	
+	if(removeMedia==true) {
+		
+		delete_route();
+		return true;
+	}
+	else {
+		
+		return false;
+	}
+	
+}
+
+//delete a route
+function delete_route() {
+	
+	var csrftoken = getCookie('csrftoken');
+    $.ajaxSetup({
+        crossDomain: false, // obviates need for sameOrigin test
+        beforeSend: function(xhr, settings) {
+            if (!csrfSafeMethod(settings.type)) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                alert(csrftoken);
+            }
+        }
+    });
+    
+   
+    
+    var route_id = $('.active').attr("id");
+    
+    
+	var request = $.ajax({
+        url: "/editor/deleteRoute/"+route_id+"/",
+        type: "GET",
+        //data: "id="+$('.media-opt').attr("name")+"&type="+type,
+        xhr: function() {  // custom xhr
+            myXhr = $.ajaxSettings.xhr();
+            return myXhr;
+        },
+        success: function(res){
+            console.log("SUCCESS entered");
+            //console.log(res['imageType']);
+            //alert("Hi");
+            //console.log("Hi");
+            console.log(res);
+            window.location.href="/editor/";
+            //$('.add-media').attr("name",res);
+           // e.val(res);
+        }
+    });
+}
+
+//resets the media when swaped
+function resetMedia() {
+	
+var media = $('.media-opt');
+	
+	
+    var start_media = []
+    
+    for(var i=0;i<media.length;i++) {
+    	
+    	var option = media[i].value;
+    	
+    	if(option=="None")
+    		option=0;
+    		
+    	
+    	 var startMedia_id = {
+    				
+    				"id":media[i].name,
+    				"option":option
+    				
+    		};
+    	 start_media.push(startMedia_id);
+    }
+    
+    var startMedia={};
+    
+    startMedia['start_media'] = start_media;
+    
+    console.log(JSON.stringify(startMedia));
+   
+    var route_id = $('.startmedia-wrapper').attr("id");
+    //var marker_id = $('.media-files').attr("id");
+    
+    
+    var csrftoken = getCookie('csrftoken');
+    $.ajaxSetup({
+        crossDomain: false, // obviates need for sameOrigin test
+        beforeSend: function(xhr, settings) {
+            if (!csrfSafeMethod(settings.type)) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                console.log(csrftoken);
+            }
+        }
+    });  
+	
+  	
+	var request = $.ajax({
+		url: "/editor/general/"+route_id+"/",
+        type: "POST",
+        dataType:"json",
+        data: JSON.stringify(startMedia),
+        contentType: "application/json;charset=utf-8",
+       
+        success: function(res){
+            console.log("SUCCESS");
+            //window.location.href="/editor/general/"+route_id+"/";
+            //alert("Hi");
+            //console.log(res);
+         }
+    }); 
+	
+	 request.done(function(msg) {
+         console.log(msg);
+     });
+
+     request.fail(function(jqXHR, textStatus) {
+         //alert( "Request failed: " + textStatus );
+     });
+}
+
+function resetStationMedia() {
+	
+	var media = $('.media-opt');
+	
+	
+    var stations = []
+    
+    for(var i=0;i<media.length;i++) {
+    	
+    	var option = media[i].value;
+    	
+    	if(option=="None")
+    		option=0;
+    		
+    	 console.log("media id "+media[i].name+" "+option);
+    	 var station_id = {
+    				
+    				"id":media[i].name,
+    				"option":option
+    				
+    		};
+    		stations.push(station_id);
+    }
+    
+    var stations_media={};
+    
+    stations_media['stations_media'] = stations;
+    
+    console.log(JSON.stringify(stations_media));
+   
+    var route_id = $('.startmedia-wrapper').attr("id");
+    var station_id = $('.media-files').attr("id");
+    
+    
+    var csrftoken = getCookie('csrftoken');
+    $.ajaxSetup({
+        crossDomain: false, // obviates need for sameOrigin test
+        beforeSend: function(xhr, settings) {
+            if (!csrfSafeMethod(settings.type)) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                console.log(csrftoken);
+            }
+        }
+    });  
+	
+  	
+	var request = $.ajax({
+		url: "/editor/media/station/"+route_id+"/"+station_id+"/",
+        type: "POST",
+        dataType:"json",
+        data: JSON.stringify(stations_media),
+        contentType: "application/json;charset=utf-8",
+       
+        success: function(res){
+            console.log("SUCCESS");
+            //window.location.href="/editor/media/"+route_id+"/";
+            //alert("Hi");
+            //console.log(res);
+         }
+    }); 
+	
+	 request.done(function(msg) {
+         console.log(msg);
+     });
+
+     request.fail(function(jqXHR, textStatus) {
+         //alert( "Request failed: " + textStatus );
+     });
+	
+}
+
 function addmedia() {
+	
+	
 	
 	var media = $('.media-opt');
 	
@@ -146,7 +357,7 @@ function addmedia() {
     	if(option=="None")
     		option=0;
     		
-    	
+    	 console.log("media id "+media[i].name+" "+option);
     	 var marker_id = {
     				
     				"id":media[i].name,
@@ -254,37 +465,7 @@ function openFileUpload(e){
 
 }
 
-//Opens the window with file options
-function publishJsonFile(e){
-    
-    var $bg = $('.publish');
-    var $upload = $('.publish-file');
-    var $btnAbort = $('.publish-abort');
-    var $btn = $('.publish');
 
-    $btnAbort.on('click',function(){
-        $bg.fadeOut();
-        $upload.fadeOut();
-        $("input[name='publish']").prop('disabled',false);
-        $("input[name='publish']").prop('checked',false);
-    });
-    $btn.on('click',function(){
-        publishSelectedTrail();
-            $bg.fadeOut();
-            $upload.fadeOut();
-            $("input[name='publish']").prop('disabled',false);
-            $("input[name='publish']").prop('checked',false);
-
-    })
-
-    var top = ($(window).height()/2) - ($upload.outerHeight()/2+100);
-    var left = ($(window).width()/2) - ($upload.outerWidth()/2-150);
-    $upload.css({top:top,left:left});
-
-    $bg.fadeIn();
-    $upload.fadeIn();
-
-}
 
 function csrfSafeMethod(method) {
     // these HTTP methods do not require CSRF protection
@@ -315,10 +496,7 @@ function uploadSelectedFile(){
             }
         }
     });
-    console.log("entered "+$( '#media_file' ).value);
-    //console.log($( '#media_file' )[0].files[0]);
-    console.log("entered1");
-
+    
     var formData = new FormData();
     formData.append( 'file', $( '#media_file' )[0].files[0] );
 
@@ -345,211 +523,10 @@ function uploadSelectedFile(){
 
 
 
-function publishSelectedTrail(){
-	
-	
-	var csrftoken = getCookie('csrftoken');
-    $.ajaxSetup({
-        crossDomain: false, // obviates need for sameOrigin test
-        beforeSend: function(xhr, settings) {
-            if (!csrfSafeMethod(settings.type)) {
-                xhr.setRequestHeader("X-CSRFToken", csrftoken);
-                console.log(csrftoken);
-            }
-        }
-    });
-	
-	//alert("Start publishing "+$("input[name='publish']").val());
-	
-	var markersMedia = $('.markersCheckboxes');
-    
-	 
-	
-    /*if(markersMedia.length!=0) {
-    	console.log(markersMedia);
-    	console.log(markersMedia[0].id);
-    	console.log(markersMedia[0].checked);
-    	
-    }*/
-    
-    var markers = []
-    
-    for(var i=0;i<markersMedia.length;i++) {
-    	
-    	//console.log(markersMedia[i].checked);
-    	var marker_id = {
-    				
-    				"id":markersMedia[i].id,
-    				"checked":markersMedia[i].checked
-    				
-    		};
-    		markers.push(marker_id);
-    		
-    }
-    
-    var markers_media={};
-    
-    markers_media['markers_media'] = markers;
-    
-    //console.log(JSON.stringify(markers_media));
-
-	
-   /* var csrftoken = getCookie('csrftoken');
-    $.ajaxSetup({
-        crossDomain: false, // obviates need for sameOrigin test
-        beforeSend: function(xhr, settings) {
-            if (!csrfSafeMethod(settings.type)) {
-                xhr.setRequestHeader("X-CSRFToken", csrftoken);
-            }
-        }
-    });
-
-
-    var formData = new FormData();
-    formData.append( 'file', $( '#media_file' )[0].files[0] ); */
-
-  /*  var request = $.ajax({
-        url: "/publish/trail/",
-        type: "POST",
-        data: "",
-        xhr: function() {  // custom xhr
-            myXhr = $.ajaxSettings.xhr();
-            if(myXhr.upload){ // if upload property exists
-                myXhr.upload.addEventListener('progress', progressHandlingFunction, false); // progressbar
-            }
-            return myXhr;
-        },
-        success: function(res){
-            console.log("SUCCESS");
-            //console.log(res);
-        }
-    });*/ 
-	
-	var request = $.ajax({
-		url: "/editor/publish/"+$("input[name='publish']").val()+"/",
-        type: "POST",
-        dataType:"json",
-        data: JSON.stringify(markers_media),
-        contentType: "application/json;charset=utf-8",
-       
-        success: function(res){
-            console.log("SUCCESS");
-            
-            //alert("Hi");
-            //console.log(res);
-         }
-    }); 
-	
-	 request.done(function(msg) {
-         console.log(msg);
-     });
-
-     request.fail(function(jqXHR, textStatus) {
-         //alert( "Request failed: " + textStatus );
-     });
-}
-
-function publishTrail() {
-	
-	var csrftoken = getCookie('csrftoken');
-    $.ajaxSetup({
-        crossDomain: false, // obviates need for sameOrigin test
-        beforeSend: function(xhr, settings) {
-            if (!csrfSafeMethod(settings.type)) {
-                xhr.setRequestHeader("X-CSRFToken", csrftoken);
-                console.log(csrftoken);
-            }
-        }
-    });
-	
-	var request = $.ajax({
-		url: "/editor/publish/"+$("input[name='publish']").val()+"/",
-        type: "GET",
-        contentType:'application/pdf',
-        success: function(res){
-            console.log("SUCCESS");
-            //console.log(res);
-            //var pdf = window.open();
-            //window.document.write(res);
-            //window.print()
-            var pdf = new Object();
-            pdf = res;
-            console.log(res.pdf_url);
-            //window.document.write(res);
-            //window.document.close();
-            //console.log(pdf);
-            //pdf.print();
-            /*var pdfContent = $("#pdf").parent();
-            var newPdf = "<embed src='/static/temp/Umapathi/markers.pdf' id='pdf'>";
-            $("#pdf").remove();
-            pdfContent.append(newPdf);
-            pdfContent.print();*/
-            
-            /*var pdf = ["/static/temp/Umapathi/markers.pdf"];
-            
-            var pdfWindow = new Array();
-            
-            pdfWindow = window.open(pdf);
-            pdfWindow.print();*/
-            
-            
-            
-            
-            
-            //console.log($("#pdf"));
-            
-            /*$('#pdf').attr('src','/static/temp/Umapathi/markers.pdf');
-            
-            var printPDF = window.frames["pdf"].focus();
-            window.frames["pdf"].print();
-            
-            
-            //console.log($('#pdf').contents());
-            
-            //printPDF.focus();
-            
-            //var pdfprint = setTimeout(printPDF.print(),50);
-            
-            //window.clearTimeout(pdfprint);
-            
-            //window.print();
-            
-            
-            //printPDF.document.write('<body onload="window.print()">'+$('#pdf').contents()+'</body>');
-            //printPDF.document.close();
-            
-            //console.log($('#pdfContent')) */
-            
-            console.log(window.navigator.userAgent);
-            var curr_browser = window.navigator.userAgent;
-            if(curr_browser.indexOf('Firefox')>-1)
-               window.open(res.pdf_url);
-            else {
-               $('#pdf').attr('src',res.pdf_url);
-               $('#pdfContent').hide();
-            }   
-            
-            //alert("Hi");
-            //console.log(res);
-         }
-	    
-	     
-	
-    });
-	
-    var curr_browser = window.navigator.userAgent;
-	
-	if(curr_browser.indexOf('Firefox')<=-1) {
-	   setTimeout(function() {
-		 
-		 var printPDF = window.frames["pdf"].focus();
-		 window.frames["pdf"].print();},500);
-	}   
-
-}
-
 function createMediaOptionsWindow(e){
 
+	
+	
     $('body').find('.media-info-box').each(function() {
         $(this).remove();
     });
@@ -561,7 +538,7 @@ function createMediaOptionsWindow(e){
     var $topbar = $('<div>',{class:"top-bar"});
     var $btnAbort = $('<button>',{class:"btn",text:"Avbryt"});
     var $header = $('<div>',{class:"header-text"});
-    var $p = $('<p>',{class:"small-text",text:"namnpåfil.jpg"});
+    var $p = $('<p>',{class:"small-text",text:e.attr('id')});
     var $btnFinished = $('<button>',{class:"btn right",text:"Klar"});
     var $optionsMenu = $('<div>',{class:"options-menu"});
     var $option1 = $('<div>',{class:"option"});

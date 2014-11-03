@@ -81,7 +81,8 @@ define(function(){
         	                "index": parseInt(j),
         	                "radius":10.0,
         	                "shouldDisplayOnCompass":false,
-        	                "swingPoint":false
+        	                "swingPoint":false,
+        	                "stationIndex":0
         	            };
         	     
         	            paths_data.push(p_data);
@@ -106,7 +107,8 @@ define(function(){
      	                "index": parseInt(i),
      	                "radius":10.0,
      	                "shouldDisplayOnCompass":false,
-     	                "swingPoint":true
+     	                "swingPoint":true,
+     	                "stationIndex":j
      	            };
       	            paths_data.push(p_data);
         	} 		
@@ -162,12 +164,14 @@ define(function(){
                 }else{
                     $p = $('<p>',{class:"errror",text:res["message"]});
                 }
-                $p.appendTo($('.station')).hide().slideDown();
+                //$p.appendTo($('.top-wrapper')).hide().slideDown();
+                //$p.appendTo($('.rowfix clearfix')).hide().slideDown();
+                $p.appendTo($('.top-wrapper'));
                 setTimeout(function(){
                     $p.slideUp(function(){
                         $p.remove();
                     })
-                },2500)
+                },1000)
             }
         });
 
@@ -218,7 +222,7 @@ define(function(){
         });
         var route_data = {};
         var inputv = $('#tour-name').val();
-	console.log(inputv);
+	//console.log(inputv);
         if(inputv.length > 0){
 
             route_data["name"] = $('#tour-name').val();
@@ -247,12 +251,66 @@ define(function(){
                         $p.slideUp(function(){
                             $p.remove();
                         })
-                    },2500)
+                    },1000)
                 }
             });
         }
     };
 
+    my.updateDatabaseWithDeletedStation = function(station_id) {
+    	
+    	var csrftoken = getCookie('csrftoken');
+
+        $.ajaxSetup({
+            crossDomain: false, // obviates need for sameOrigin test
+            beforeSend: function(xhr, settings) {
+                if (!csrfSafeMethod(settings.type)) {
+                    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                }
+            }
+        });
+
+        var route_data = {};
+        route_data["route_id"] = parseInt(getIDfromURL());
+        //alert(stations+"  "+stations.length);
+        
+        route_data["station_id"] = station_id;
+        
+        console.log(JSON.stringify(route_data));
+        var request = $.ajax({
+            url: "/editor/deleteStation",
+            type: "POST",
+            data: JSON.stringify(route_data),
+            datatype:JSON,
+            contentType: "application/json;charset=utf-8",
+
+            success: function(res){
+                console.log(res);
+                /*if(res["result"] == "ok"){
+                    $p = $('<p>',{class:"success",text:res["message"]});
+                }else{
+                    $p = $('<p>',{class:"errror",text:res["message"]});
+                }*/
+                //$p.appendTo($('.top-wrapper')).hide().slideDown();
+                //$p.appendTo($('.rowfix clearfix')).hide().slideDown();
+                $p.appendTo($('.top-wrapper'));
+                setTimeout(function(){
+                    $p.slideUp(function(){
+                        $p.remove();
+                    })
+                },1000)
+            }
+        });
+
+        request.done(function(msg) {
+            //console.log(msg);
+        });
+
+        request.fail(function(jqXHR, textStatus) {
+            alert( "Request failed: " + textStatus );
+        });
+        
+    };
 
     return my;
 }());

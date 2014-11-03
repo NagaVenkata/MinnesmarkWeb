@@ -16,6 +16,7 @@ define(function () {
         stations,
         radiusDistance,
         editorSaved,
+        station_id,
         mapIsSet;
 
     my.isSaved = function(){
@@ -31,6 +32,11 @@ define(function () {
     my.getStations = function(){
         return stations;
     };
+    
+    my.getStation_id = function(){
+        return station_id;
+    };
+    
     my.getPath = function(){
     	return polyLine.getPath().getArray();
     };
@@ -70,7 +76,7 @@ define(function () {
     };
 
     my.initializeEditor = function(){
-	console.log("bfhfhksrebvbgvkdr");
+	//console.log("bfhfhksrebvbgvkdr");
         mapLoaded = false;
 	mapIsSet = false;
         browserSupportFlag =  new Boolean();
@@ -235,6 +241,7 @@ define(function () {
                 }
                 editorSaved = false;
             }
+	    saveRoute();
         });
 
 	// Check if the swing point/station is in a valid position
@@ -284,6 +291,7 @@ define(function () {
 
     loadStation = function(position,nextPathIndex){
         var newStation = createStation(position, nextPathIndex);
+        console.log("position "+position);
         stations.push(newStation);
     }
 
@@ -345,6 +353,7 @@ define(function () {
             if(stations.length > 1) {
                 collisionControll(station.pathIndex,true);
             }
+	    saveRoute();
         });
 
 	// Popup a option window
@@ -416,7 +425,6 @@ define(function () {
     addOptionsWindow = function(latLng,index,func){
         var content = "<div class='delStation clearfixmouseout'>" +
             "<h3>Station "+(index+1)+"</h3>" +
-            "<button class='btn'>Klar</button>" +
             "<div class='input-wrapper'>" +
             "<label for='lng'>Longitude</label> " +
             "<input id='lng'' type='text' name='longitude'value='"+latLng.lng()+"' >" +
@@ -432,8 +440,14 @@ define(function () {
         optionsWindow.open(map);
 
         $('.remove-button').on('click',function(){
-            func(index);
+        	
+        	var deleteStation = confirm("Vill du verkligen ta bort stationen?");
+        	
+        	if(deleteStation==true) {
+        		func(index);
+        	}	
         })
+        
     }
 
     // Removes a swing point
@@ -445,6 +459,13 @@ define(function () {
             }
         }
         optionsWindow.close();
+        
+        require(["/static/editor/javascript/mmEditor.js","/static/editor/javascript/mmSaveAndLoadRoute.js"],
+        		function(mmEditor,mmSaveAndLoadRoute) {
+        		    console.log("sparar");
+        		    mmEditor.saveEditor();
+        			mmSaveAndLoadRoute.saveToDatabase(mmEditor.getStations(),mmEditor.getPath());
+        		});
     };
 
     // Removes a station
@@ -470,7 +491,19 @@ define(function () {
                     polyLine.getPath().removeAt(pIndex);
                     Decrease++;
                 }
-                updateDatabaseWithDeletedStation(stations[sIndex]);
+                alert(stations[sIndex].pathIndex);
+                station_id = stations[sIndex].pathIndex;
+                //updateDatabaseWithDeletedStation(stations[sIndex]);
+                require(["/static/editor/javascript/mmEditor.js","/static/editor/javascript/mmSaveAndLoadRoute.js"],
+                		function(mmEditor,mmSaveAndLoadRoute) {
+                		    console.log("sparar");
+                		    //mmEditor.saveEditor();
+                		    alert(mmEditor.getStation_id());
+                		    mmSaveAndLoadRoute.updateDatabaseWithDeletedStation(mmEditor.getStation_id());
+                		    mmEditor.saveEditor();
+                			mmSaveAndLoadRoute.saveToDatabase(mmEditor.getStations(),mmEditor.getPath());
+                		});
+                
                 stations[sIndex].setMap(null);
                 stations[sIndex].radius.setMap(null);
                 stations.splice(sIndex,1);
@@ -567,6 +600,17 @@ define(function () {
 
 
     };
+
+
+    saveRoute = function() {
+	console.log("inne");
+	require(["/static/editor/javascript/mmEditor.js","/static/editor/javascript/mmSaveAndLoadRoute.js"],
+		function(mmEditor,mmSaveAndLoadRoute) {
+		    console.log("sparar");
+		    mmEditor.saveEditor();
+		    mmSaveAndLoadRoute.saveToDatabase(mmEditor.getStations(),mmEditor.getPath());
+		});
+    }
 
   return my;
 }());

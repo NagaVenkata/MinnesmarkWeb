@@ -1,33 +1,41 @@
 body{
-    font-family: 'Nobile', sans-serif;
-    color: #393939;
-    font-size:13pt;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #222222;
+    font-size:12pt;
     font-weight: normal;
 }
 h1{
     color:#393939;
-    font-size: 24pt;
+    font-size: 18pt;
     font-weight: normal;
 }
 h2{
     color:#393939;
-    font-size: 18pt;
+    font-size: 14pt;
     font-weight: normal;
+    margin-top:0em;
+    margin-bottom:0em;
 }
 h3{
     text-transform:uppercase;
     color:#393939;
-    font-size: 14pt;
+    font-size: 12pt;
     font-weight: normal;
+    /*display:inline;*/
+    margin-left:1em; 
+    margin-bottom:0em;
 }
 .small-text{
-    font-size: 11pt;
+    font-size: 10pt;
     color: #393939;
+    margin-top:0em;
+    margin-bottom:0em;
+    margin-left:1em;
 }
 
 .marker-small-text{
 	left:25px;
-	font-size: 11pt;
+	font-size: 10pt;
     color: #393939;
 }
 
@@ -46,20 +54,23 @@ button{
     border:none;
     border-bottom: 2px solid #179fc5;
     padding: 3px 5px 0px 5px;
+    color:white;
+    
 }
 
 .btn:active,
 input[type="submit"]:active,
 button:active{
-    background-color: #148bad;
+    background-color: #EBEBEB;
     border-bottom:none;
     border-top: 2px solid #1ab0db;
+    color:white;
 }
 
 .btn:disabled,
 input[type="submit"]:disabled,
 button:disabled{
-    background-color: #7edef9;
+    background-color: #EBEBEB;
     border-bottom: 2px solid #7bc8dd;
     color: white;
 }

@@ -74,7 +74,7 @@
                                     <button class="media-opt btn round" id="{{m.name}}" name="{{ m.id }}" value="{{m.options}}"><span class="typcn typcn-info-large"></span></button>
                                     <p>{{ m.name }}</p>
                                     
-                                    <form action="" method="post"> 
+                                    <form action="" method="post" onsubmit="return getMediaRemoveConfirm();"> 
                                         {% csrf_token %}
                                         <input type="hidden" name="delmedia" value="{{ m.id }}">
                                         <button class="btn round orange minus"><span class="typcn typcn-minus"></span></button>

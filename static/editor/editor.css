@@ -124,7 +124,7 @@ body{
     padding: 0 10px;
     font-size:18pt;
     cursor: pointer;
-
+    color:#1dc5f5;
 }
 .tour ul.tour-list li h2,
 .tour ul.tour-list li p{
@@ -149,7 +149,7 @@ body{
 .tour ul.tour-list li ul.tour-menu li{
     position: relative;
     background-color:#FFF;
-    border-top: 2px solid #d6d5d2;
+    border-top: 1px solid #d6d5d2;
     border-bottom: none;
     padding:0;
 }
@@ -175,6 +175,7 @@ body{
 }
 .tour ul.tour-list li ul.tour-menu li a.active{
     background-color: rgba(0,0,0,.1);
+    /*background-color: #d6d5d2;*/
 }
 
 input#tour-name{
@@ -193,7 +194,7 @@ input#tour-name{
     background-color: white;
     margin:0;
     cursor: move;
-    margin-bottom: 2px;
+    margin-bottom: 1px;
     padding:5px;
 }
 .startmedia-wrapper ul.media-files li:last-child{

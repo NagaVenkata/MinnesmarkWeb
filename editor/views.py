@@ -21,7 +21,7 @@ from reportlab.pdfgen import canvas
 from editor.models import Media, Route, Station, Polyline, Marker
 from minnesmark.settings import PROJECT_ROOT
 from editor.jsonObject import TitleEvents
-from editor.jsonObject import Station_SwingPointEvents,MarkerEvent,MediaEvent,ModelEvent,Marker_Media,MinnesmarkObjWriter
+from editor.jsonObject import Station_SwingPointEvents,MarkerEvent,MediaEvent,ModelEvent,Marker_Media,MinnesmarkObjWriter,StartMediaEvent,StationMediaEvent,CompassEvents
 
 # Login_required means that the user has to be looged in to see that specific page
 
@@ -58,6 +58,32 @@ def render_page_general(request,route_id):
     route = validateRoute(route_id,request.user)
     if route is False:
         return HttpResponseRedirect('/editor')
+
+    if request.is_ajax():
+            print("ajax request")
+            if(request.method=="POST"):
+                response_data = {}
+                try:
+                    json_str = request.body.decode(encoding='UTF-8')
+                    json_obj = json.loads(json_str)
+                    start_media = json_obj['start_media']
+                    print(len(start_media))
+                    order_count=1
+                    if(len(start_media)>0):
+                        for startMedia in start_media:
+                            media_object = Media.objects.filter(id=startMedia['id'])
+                            media = media_object[0]
+                            media.order = order_count
+                            media.options = startMedia['option']
+                            media.save()
+                            order_count +=1
+                        resetStartMediaEventNames(route_id,request.user)
+                except ValidationError as e:
+                    print(e.args)
+                    response_data['result'] = 'failed'
+                    response_data['message'] = 'Kunde inte ladda data'
+            
+                return HttpResponse(json.dumps(response_data), content_type="application/json")
 
     route_name = route.name
     #If POST request to page
@@ -128,15 +154,10 @@ def render_page_marker(request,route_id,marker_id):
     markerName = "Markör"+str(marker_id) 
     
     
-    
     route = validateRoute(route_id,request.user)
     if route is False:
         return HttpResponseRedirect('/editor')
-            
-            
-    
-    print("entered")
-
+   
     if route.user == request.user or request.user.is_superuser:
         
         if request.is_ajax():
@@ -204,6 +225,8 @@ def render_page_marker(request,route_id,marker_id):
         marker_object = Marker.objects.filter(route_id=route_id,index=marker_id)
         if(len(marker_object)==0):
             save_marker_to_database(request,route_id,marker_id)
+        marker_object = Marker.objects.filter(route_id=route_id,index=marker_id)
+        
         if(request.method == 'POST'):
             try:
                 print(request.POST['delmedia'])
@@ -414,18 +437,41 @@ def render_page_publish(request,route_id):
                 marker = Marker_Media(m.name) 
                 for media in Media.objects.filter(route=route,marker=m,user=request.user).order_by('order'):
                     marker.setMarkerMedia(media.as_json())
-                markers.append(marker)
-            c = canvas.Canvas("/Users/Umapathi/Desktop/MinnesmarkWeb/static/temp/Umapathi/markers.pdf")
+                if(len(marker.getMarkerMedia())!=0):
+                    markers.append(marker)
+            path = PROJECT_ROOT
+            os.chdir(path)
+            # Move up one
+            os.chdir('..')
+    
+            folder = os.getcwd()
+            path = folder+"/static/temp/"+str(request.user)+"/markers.pdf"
+            c = canvas.Canvas(path)
             i=1
             
+            path = PROJECT_ROOT
+            os.chdir(path)
+            # Move up one
+            os.chdir('..')
+    
+            folder = os.getcwd()
+
+            
             for marker in markers:
-                c.drawImage("/Users/Umapathi/Desktop/MinnesmarkWeb/static/globalmarkers/pattern"+str(i)+".png",200,400)
+                    
+                path = folder+"/static/globalmarkers/pattern"+str(i)+".png"
+                c.drawImage(path,200,400)
+                print("markers "+str(len(marker.getMarkerMedia())))
                 num_media = len(marker.getMarkerMedia())-1
+                print("media "+str(num_media))
                 media = "Media:"
-                for j in range(0,len(marker.getMarkerMedia())-1):
+                for j in range(0,len(marker.getMarkerMedia())):
+                    print("marker media")
+                    if(j==len(marker.getMarkerMedia())-1):
+                        media = media+marker.getMarkerMedia()[len(marker.getMarkerMedia())-1]['name']
                     print(marker.getMarkerMedia()[j])
                     media = media+marker.getMarkerMedia()[j]['name']+","
-                media = media+marker.getMarkerMedia()[num_media]['name']
+                #media = media+marker.getMarkerMedia()[len(marker.getMarkerMedia())-1]['name']
                 c.drawString(100,200,media)
                 #print(c._pagesize)
                 c.showPage()
@@ -442,6 +488,15 @@ def render_page_publish(request,route_id):
             try:
                 json_str = request.body.decode(encoding='UTF-8')
                 json_obj = json.loads(json_str)
+                stations_media = json_obj['stations_media']
+                if(len(stations_media)>0):
+                    for station_media in stations_media:
+                        media_object = Media.objects.filter(id=station_media['id'])
+                        media = media_object[0]
+                        media.treasure = station_media['checked']
+                        media.save()
+
+                
                 markers_media = json_obj['markers_media']
                 print(len(markers_media))
                 print("lenght "+str(len(json_obj)))
@@ -457,12 +512,26 @@ def render_page_publish(request,route_id):
                 response_data['message'] = 'Kunde inte ladda data'
             
             publish_trail(request,route_id)
+            route.published = True
+            route.save()
             return HttpResponse(json.dumps(response_data), content_type="application/json")
 
     #Get all media set to startmedia
     start_media = []
     for m in Media.objects.filter(route=route,mediatype=Media.STARTMEDIA, user=request.user).order_by('order'):
         start_media.append(m.as_json())
+
+    stations = []
+    
+    #for each marker get the media associated with it
+    for station in Station.objects.filter(route=route):
+        stationName = "Station"+str(station.number)
+        station1 = Marker_Media(stationName) 
+        for media in Media.objects.filter(route=route,station_id=station.number,user=request.user).order_by('order'):
+            station1.setMarkerMedia(media.as_json)
+        if(len(station1.getMarkerMedia())!=0):
+            stations.append(station1)
+
     
     markers = []
     
@@ -471,11 +540,12 @@ def render_page_publish(request,route_id):
         marker = Marker_Media(m.name) 
         for media in Media.objects.filter(route=route,marker=m,user=request.user).order_by('order'):
             marker.setMarkerMedia(media.as_json)
-        markers.append(marker)
+        if(len(marker.getMarkerMedia())!=0):
+            markers.append(marker)
     
     
          
-    return render_to_response('editor/publish.html', {'routes': routes,'cur_route':route_id,'start_media':start_media,"markers":markers},
+    return render_to_response('editor/publish.html', {'routes': routes,'cur_route':route_id,'start_media':start_media,"stations":stations,"markers":markers},
                               context_instance=RequestContext(request))
 
 
@@ -505,6 +575,8 @@ def publish_trail(request,route_id):
     if(num_stations>0):
         title.writeEvent("NumberOfRegions","numRegions", len(stations))
         attrib.append(title.asJson())
+        title.writeEvent("compassView","showCompassView",True)
+        attrib.append(title.asJson())
     
     actions = ["Start"]
     title.writeEventActions("launch","generic","application-launched",actions)
@@ -517,12 +589,31 @@ def publish_trail(request,route_id):
     for m in Marker.objects.filter(route=route):
         marker = Marker_Media(m.name) 
         for media in Media.objects.filter(route=route,marker=m,user=request.user).order_by('order'):
-            marker.setMarkerMedia(media.as_json)
+            marker.setMarkerMedia(media.as_json())
         num_markers.append(marker)
     
+    if(len(stations)>0):
+        markers1.append("compassView")
+    
+    i=1    
+    for p in points:
+        if(p.swingPoint==False and i==1):
+            markers1.append("enableStation1Compass")
+        if(p.swingPoint==False and i!=1):
+            markers1.append("disableStation"+str(i)+"Compass")
+        if(p.swingPoint==True):
+            markers1.append("disableStation"+str(p.stationIndex)+"SwingPoint"+str(p.index)+"Compass")
+        i=i+1    
+              
+        
     for markers_media in num_markers:
         if(len(markers_media.getMarkerMedia())>0):
             markers1.append(markers_media.getMarkerName()) 
+            
+    start_media = Media.objects.filter(route=route,user=request.user,mediatype=Media.STARTMEDIA).order_by('order')
+    
+    if(len(start_media)!=0):
+        markers1.append(start_media[0].eventName)
     
     title.writeEventActions("Start","start","application-start",markers1)
     attrib.append(title.asJsonAction())
@@ -536,15 +627,62 @@ def publish_trail(request,route_id):
                 collectItems = collectItems+1
                 
     title.writeEvent("NumberOfCollectItems","numCollectItems",collectItems)
-    attrib.append(title.asJson())        
+    attrib.append(title.asJson()) 
+    
+    if(len(start_media)!=0):
+        for media in start_media:
+            start_media_event = StartMediaEvent(media)
+            start_media_event.mediaIndex(media)
+            attrib.append(start_media_event.as_json())
+            
+           
     
     #attrib.append(attr)
     #attrib.append(attr1)
     if(num_stations>0):
         station = Station_SwingPointEvents(route)
         for p in points:
-            station.PolylineIndex(p)
+            station.PolylineIndex(p,request.user)
             attrib.append(station.as_json())
+    
+    if(num_stations>0):
+        index=0
+        i=0
+        stations = Station.objects.filter(route=route)
+        while(i<len(stations)-1):
+            index = index+1
+            station_media = Media.objects.filter(route=route,station=stations[i],user=request.user)
+            next_station_media = Media.objects.filter(route=route,station=stations[i+1],user=request.user)
+            for station_eventMedia in station_media:
+                stationEventMedia = StationMediaEvent(route)
+                if(len(next_station_media)!=0 or i<len(stations)-1):
+                    stationEventMedia.mediaIndex(station_eventMedia, stations[i],stations[i+1],index)
+                else:
+                    stationEventMedia.mediaIndex(station_eventMedia, stations[i],None,index)
+                attrib.append(stationEventMedia.as_json())
+            i=i+1
+    
+    i=0
+    for p in points:
+        if(p.swingPoint==False):
+            compassEvent = CompassEvents("enableStation"+str(i+1)+"Compass")
+            compassEvent.writeEvents(True, "station"+str(i+1))
+            attrib.append(compassEvent.as_json())
+            
+            compassEvent = CompassEvents("disableStation"+str(i+1)+"Compass")
+            compassEvent.writeEvents(False, "station"+str(i+1))
+            attrib.append(compassEvent.as_json())
+            i=i+1
+        if(p.swingPoint==True):
+            compassEvent = CompassEvents("enableStation"+str(p.stationIndex)+"SwingPoint"+str(p.index)+"Compass")
+            compassEvent.writeEvents(True, "station"+str(p.stationIndex)+"_swingPoint"+str(p.index))
+            attrib.append(compassEvent.as_json())
+            
+            compassEvent = CompassEvents("disableStation"+str(p.stationIndex)+"SwingPoint"+str(p.index)+"Compass")
+            compassEvent.writeEvents(False, "station"+str(p.stationIndex)+"_swingPoint"+str(p.index))
+            attrib.append(compassEvent.as_json())
+                        
+
     
 #     markerEvent = MarkerEvent(route)
 #     
@@ -571,7 +709,7 @@ def publish_trail(request,route_id):
                         writeMarkerFiles(marker.name,marker_count,request.user,route_id)
                         marker_count = marker_count+1
                         
-                    mediaEvent = MediaEvent(media)
+                    mediaEvent = MediaEvent(media,num_stations)
                     mediaEvent.mediaIndex(media)
                     attrib.append(mediaEvent.as_json())
                 else:
@@ -706,11 +844,119 @@ def writeMarkerFiles(markerName,marker_id,user,route_id):
 # NOT DONE IN URL !!!!!
 # TODO render right media with files
 @login_required
-def render_page_addMedia(request,route_id):
+def render_page_addMedia(request,route_id,station_id):
     routes = get_all_routes_from_user(request.user.id)
     print(request)
-    return render_to_response('editor/addMedia.html', {'routes': routes,'cur_route':route_id},
-                               context_instance=RequestContext(request))
+    route = validateRoute(route_id,request.user)
+    if route is False:
+        return HttpResponseRedirect('/editor')
+            
+            
+    
+    print("entered")
+
+    if route.user == request.user or request.user.is_superuser:
+        
+        if request.is_ajax():
+            print("ajax request")
+            if(request.method=="POST"):
+                response_data = {}
+                try:
+                    json_str = request.body.decode(encoding='UTF-8')
+                    json_obj = json.loads(json_str)
+                    stations_media = json_obj['stations_media']
+                    print(len(stations_media))
+                    order_count=1
+                    if(len(stations_media)>0):
+                        for station_media in stations_media:
+                            media_object = Media.objects.filter(id=station_media['id'])
+                            media = media_object[0]
+                            media.order = order_count
+                            media.options = station_media['option']
+                            media.save()
+                            order_count +=1
+                        resetStationEvents_nextEvents(route_id,request.user,station_id)
+                except ValidationError as e:
+                    print(e.args)
+                    response_data['result'] = 'failed'
+                    response_data['message'] = 'Kunde inte ladda data'
+            
+                return HttpResponse(json.dumps(response_data), content_type="application/json")
+            
+            print(request.GET['id'])
+            print(request.GET['type'])
+            station_object = Station.objects.filter(route_id=route_id,id=station_id)
+            media_object = Media.objects.filter(id=request.GET['id'],route=route,station=station_object[0])
+            media = media_object[0]
+            print(media.options)
+            print(media.id)
+            try:
+                #print(Media.PANORAMA)           
+                media.options = request.GET['type']
+                media.save()
+                media_object = Media.objects.filter(id=request.GET['id'],route=route,station=station_object[0])
+                print("media options "+str(media_object[0].options))
+            except ValidationError as e:
+                print(e.args)
+            
+            marker_media = []
+            for m in Media.objects.filter(route=route,station=station_object[0], user=request.user).order_by('order'):
+                marker_media.append(m.as_json())
+            
+            #media_option = None
+        
+            #if(len(marker_media) == 1):
+            #    media_option = marker_media[0]['options']
+        
+            #if(len(marker_media)>1):
+            #   print(marker_media[len(marker_media)-1]['options'])
+            #   media_option = marker_media[len(marker_media)-1]['options']
+
+            media_type = request.GET['type']    
+            return HttpResponse(media_type)
+            
+        
+        #stations = Station.objects.filter(route=route)
+        station_object = Station.objects.filter(route_id=route_id,id=station_id)
+        if(request.method == 'POST'):
+            try:
+                print(request.POST['delmedia'])
+                #Runs if you want to delete a media in startmedia
+                success = delete_media(request.POST['delmedia'], request.user.id,route_id,station_id,0)
+            except:
+                #otherwise you want to upload a media
+                success, media_id = handle_upload(request,request.FILES['media_file'],route_id,station_id,0
+                                                  )
+                print(station_id)
+        
+        station_media = []
+        for m in Media.objects.filter(route=route,station_id=station_object[0].number, user=request.user).order_by('order'):
+            station_media.append(m.as_json())
+            
+        print(station_media)
+        
+        media_option = None
+        
+        if(len(station_media) == 1):
+            media_option = station_media[0]['options']
+        
+        if(len(station_media)>1):
+            print(station_media[len(station_media)-1]['options'])
+            media_option = station_media[len(station_media)-1]['options']
+        
+        #print(marker_media)
+        return render_to_response('editor/addMedia.html',
+                                  {'station_media':station_media,
+                                   'routes': routes,
+                                   'cur_route':route,
+                                   'station_id':station_id,
+                                   'station_name':"Station1",
+                                   'prev_media_type':media_option
+                                   },
+                              context_instance=RequestContext(request))
+    else:
+        redirect('/account/login')
+
 
 # Function for uploading media
 #===============================================================================
@@ -831,17 +1077,47 @@ def handle_upload(request,f,route_id,station_id,marker_id):
         
     
     folder = os.getcwd()
-
+    
+    
     #Fullpath to file
     fullpath = folder + "/" + f.name
     
     
-
     #Try to create file
     try:
         with open(fullpath, 'wb+') as destination:
             for chunk in f.chunks():
                 destination.write(chunk)
+        if(' ' in str(fullpath)):
+            os.rename(fullpath, str(fullpath).replace(" ","_"))
+            fullpath = fullpath.replace(" ","_")
+            f.name = f.name.replace(" ","_")
+        if('ö' in str(fullpath)):
+            os.rename(fullpath, str(fullpath).replace("ö","o"))
+            fullpath = fullpath.replace("ö","o")
+            f.name = f.name.replace("ö","o")
+        if('Ö' in str(fullpath)):
+            os.rename(fullpath, str(fullpath).replace("Ö","O"))
+            fullpath = fullpath.replace("Ö","O")
+            f.name = f.name.replace("Ö","O")
+        if('å' in str(fullpath)):
+            os.rename(fullpath, str(fullpath).replace("å","a"))
+            fullpath = fullpath.replace("å","a")
+            f.name = f.name.replace("å","a")
+        if('Å' in str(fullpath)):
+            os.rename(fullpath, str(fullpath).replace("Å","A"))
+            fullpath = fullpath.replace("Å","A")
+            f.name = f.name.replace("Å","A")
+        if('ä' in str(fullpath)):
+            os.rename(fullpath, str(fullpath).replace("ä","a"))
+            fullpath = fullpath.replace("ä","a")
+            f.name = f.name.replace("ä","a")
+        if('Ä' in str(fullpath)):
+            os.rename(fullpath, str(fullpath).replace("Ä","A"))
+            fullpath = fullpath.replace("Ä","A")
+            f.name = f.name.replace("Ä","A")
+        
+            
     except:
         return False
 
@@ -849,13 +1125,19 @@ def handle_upload(request,f,route_id,station_id,marker_id):
     userobject = User.objects.get(id=request.user.id)
     route_object = Route.objects.get(id=route_id)
     
+    if(station_id!=0):
+        station_object = Station.objects.filter(route_id=route_id,id=station_id)
+        station_media_count = Media.objects.filter(station_id=station_object[0].number,mediatype=Media.STATION_MEDIA,user=userobject).count()
+    
     if(marker_id!=0):
         marker_object = Marker.objects.filter(route_id=route_id,index=marker_id)
     
+    startmedia_count = 0
     media_count = 0
     
     if(station_id == 0 and marker_id == 0):
-        media_count = Media.objects.filter(mediatype=Media.STARTMEDIA, user=userobject).count()
+        startmedia_count = Media.objects.filter(mediatype=Media.STARTMEDIA, user=userobject).count()
+        startMedia =  Media.objects.filter(mediatype=Media.STARTMEDIA,user = userobject)
     
     if(marker_id!=0):
         media_count = Media.objects.filter(marker=marker_object[0],mediatype=Media.AR_MEDIA, user=userobject).count()
@@ -874,7 +1156,37 @@ def handle_upload(request,f,route_id,station_id,marker_id):
     if(station_id == 0 and marker_id == 0):
         #Save media as STARTMEDIA
         # TODO create any type of media and add to station
-        eventName = f.name+str(media_count+1)
+        
+        eventName = None
+        option = 0
+        type = None
+        
+        #gets all the start media images 
+        startmedia_images = Media.objects.filter(mediatype=Media.STARTMEDIA,user = userobject,options = 3)
+        
+        print("start media "+str(startmedia_count))
+        
+        if(isImageFile(f.name)):
+            eventName = "start"+"_"+"Image"+str(startmedia_count+1)
+            type="image"
+            option=3
+        if(isAudioFile(f.name)):
+            eventName = "start"+"_"+"Audio"+str(startmedia_count+1)
+            type="audio"
+            option=0
+        if(isVideoFile(f.name)):
+            eventName = "start"+"_"+"Video"+str(startmedia_count+1)
+            type="video"
+            option = 0
+        
+        if(startmedia_count>=1):
+            print("next event name "+eventName)
+            startmedia = startMedia[startmedia_count-1]
+            startmedia.nextEventName = eventName
+            startmedia.save()
+            nextEventName = None
+        
+        #eventName = f.name+str(media_count+1)
         media = Media(route=route_object,
                 filename=f.name,
                 filepath=fullpath,
@@ -882,12 +1194,65 @@ def handle_upload(request,f,route_id,station_id,marker_id):
                 treasure=False,
                 mediatype=Media.STARTMEDIA,
                 user=userobject,
-                order=media_count + 1,
-                station=None,
+                order=startmedia_count + 1,
+                options = option,
+                station_id=None,
                 marker=None,
                 nextEventName=None,
                 eventName=eventName,
                 type=type)
+    
+    if(station_id != 0):
+        #Save media as STARTMEDIA
+        # TODO create any type of media and add to station
+        
+        eventName = None
+        option = 0
+        type = None
+        
+        #gets all the start media images 
+        station_media = Media.objects.filter(mediatype=Media.STATION_MEDIA,user = userobject,station_id=station_object[0].number)
+        
+        print("station media "+str(station_media))
+        
+        station_index = station_object[0].number
+        
+        if(isImageFile(f.name)):
+            eventName = "station"+str(station_index)+"_"+"Image"+str(station_media_count+1)
+            type="image"
+            option=3
+        if(isAudioFile(f.name)):
+            eventName = "station"+str(station_index)+"_"+"Audio"+str(station_media_count+1)
+            type="audio"
+            option=0
+        if(isVideoFile(f.name)):
+            eventName = "station"+str(station_index)+"_"+"Video"+str(station_media_count+1)
+            type="video"
+            option = 0
+        
+        if(len(station_media)>=1):
+            print("next event name "+eventName)
+            stationmedia = station_media[station_media_count-1]
+            stationmedia.nextEventName = eventName
+            stationmedia.save()
+            nextEventName = None
+        
+        #eventName = f.name+str(media_count+1)
+        media = Media(route=route_object,
+                filename=f.name,
+                filepath=fullpath,
+                size=f.size,
+                treasure=False,
+                mediatype=Media.STATION_MEDIA,
+                user=userobject,
+                order=station_media_count + 1,
+                options = option,
+                station_id=station_object[0].number,
+                marker=None,
+                nextEventName=None,
+                eventName=eventName,
+                type=type)
+    
         
     if(marker_id != 0):
         #Save media as STARTMEDIA
@@ -932,7 +1297,7 @@ def handle_upload(request,f,route_id,station_id,marker_id):
                 user=userobject,
                 order=media_count + 1,
                 options = option,
-                station=None,
+                station_id=None,
                 marker=marker_object[0],
                 nextEventName=nextEventName,
                 eventName = eventName,
@@ -1018,33 +1383,55 @@ def save_route_to_database(request):
     #Save all stations
 
     try:
-
+        test = []
         for s in json_obj["stations"]:
-            station = Station(route=route,
+            alreadyExist = False
+            for x in test:
+                if s["index"] == x:
+                    alreadyExist = True
+            test.append(s["index"])
+
+            if alreadyExist:
+                print("Station already exist")
+            else:
+                station = Station(route=route,
                               number=s["number"],
                               index=s["index"])
-            station.save()
+                station.save()
     except:
         response_data['result'] = 'failed'
         response_data['message'] = 'Kunde inte spara markörer'
     #Save positoins on polyline
+
     try:
+        test = []
         for point in json_obj["points"]:
-            point = Polyline(route=route,
-                           latitude=point["latitude"],
-                           longitude=point["longitude"],
-                           index=point["index"],
-                           radius = point["radius"],
-                           shouldDisplayOnCompass = point["shouldDisplayOnCompass"],
-                           swingPoint = point["swingPoint"])
-            point.save()
+            alreadyExist = False
+            for x in test:
+                if point["index"] == x:
+                    alreadyExist = True
+            test.append(point["index"])
+
+            if alreadyExist:
+                print("Swingpoint already exist")
+            else:
+            #print(point)
+                point = Polyline(route=route,
+                                 latitude=point["latitude"],
+                                 longitude=point["longitude"],
+                                 index=point["index"],
+                                 radius = point["radius"],
+                                 shouldDisplayOnCompass = point["shouldDisplayOnCompass"],
+                                 swingPoint = point["swingPoint"],
+                                 stationIndex=point["stationIndex"])
+                point.save()
+
         response_data['result'] = 'ok'
         response_data['message'] = 'Rutten sparades'
     except ValidationError as e:
         print(e.args) 
         response_data['result'] = 'failed'
         response_data['message'] = 'Kunde inte spara punkter'
-
 
     return HttpResponse(json.dumps(response_data), content_type="application/json")
 
@@ -1070,7 +1457,23 @@ def save_route_name_to_db(request):
 
     route = Route.objects.get(id=json_obj["route_id"])
     if route.user == request.user:
-        route.name = json_obj['name'];
+        route_name = json_obj['name']
+        if(' ' in route_name):
+            route_name = route_name.replace(" ","_")
+        if('å' in route_name):
+            route_name = route_name.replace("å","a")
+        if('Å' in route_name):
+            route_name = route_name.replace("Å","A")
+        if('ä' in route_name):
+            route_name = route_name.replace("ä","a")
+        if('Ä' in route_name):
+            route_name = route_name.replace("Ä","A")
+        if('ö' in route_name):
+            route_name = route_name.replace("ö","o")
+        if('Ö' in route_name):
+            route_name = route_name.replace("Ö","O")
+            
+        route.name = json_obj['name']
         route.save()
         response_data['result'] = 'ok'
         response_data['message'] = 'Sparat'
@@ -1079,6 +1482,107 @@ def save_route_name_to_db(request):
         response_data['result'] = 'failed'
         response_data['message'] = 'Du äger inte denna rutt.'
         return HttpResponse(json.dumps(response_data), content_type="application/json")
+
+def delete_route(request,route_id):
+    response_data = {}
+    try:
+        route = Route.objects.get(id=route_id)
+        Route.objects.get(id=route_id).delete()
+        Station.objects.filter(route=route).delete()
+        Media.objects.filter(route=route).delete()
+        response_data['message'] = 'hej'
+    except ValidationError as e:
+        response_data['message'] = 'hej'
+        print(e.args())
+    return HttpResponse(json.dumps(response_data), content_type="application/json")
+    
+def delete_station(request):
+    
+    response_data = {}
+    
+    try:
+        json_str = request.body.decode(encoding='UTF-8')
+        json_obj = json.loads(json_str)
+    except:
+        response_data['result'] = 'failed'
+        response_data['message'] = 'Kunde inte ladda data'
+    #Delete all old entrys and save over them
+    try:
+        route_id = json_obj["route_id"]
+        station_id = json_obj['station_id']
+        route = Route.objects.get(id=route_id)
+        
+        stations = Station.objects.filter(route = route)
+        
+        next_station = None
+        current_station = None
+        next_stationIndex = -1
+        
+        print("stations "+str(len(stations)))
+        
+        for i in range(0, len(stations)-1):
+            print("station index "+str(stations[i].index))
+            if(stations[i].index==station_id):
+                print("entered station id")
+                if(i!=len(stations)):
+                    next_stationIndex = i+1
+                    next_station = stations[i+1]   
+                    print("station id "+str(next_station.number))
+                    break 
+            
+        print(current_station)
+        #print(current_station.number)
+        
+        print("station id "+str(station_id))
+        #print("station id "+str(next_station.number))
+        
+        polyindex = Station.objects.get(route=route,index=station_id)
+        print("polyindex "+str(polyindex))
+        #r_station = Station.objects.filter(route = route,index=station_id).delete()
+        #r_polyline = Polyline.objects.filter(route = route,index=polyindex.index).delete()
+        #Polyline.objects.filter(route=route,stationIndex=prev_station).delete()
+        #if(current_station!=None):
+            #Polyline.objects.filter(route=route,stationIndex=current_station).delete()
+        nextStation = None    
+        try:
+            Media.objects.filter(route=route,station_id=polyindex.number).delete()
+            print("next station index "+str(next_stationIndex))
+            if(next_stationIndex!=-1):
+                for i in range(next_stationIndex , len(stations)):
+                    print("current station number, index "+str(next_stationIndex)+" "+str(stations[i].number)+" "+str(i)) 
+                    media = Media.objects.filter(route=route,station_id=stations[i].number)
+                    polyindex = stations[i-1]
+                    print("next stations media "+str(len(media))+" "+str(polyindex.number)+"  "+str(stations[i].number))
+                    if(len(media)!=0):
+                        for m in media:
+                            print("next station number "+str(polyindex.number))
+                            print(m.as_json())
+                            try:
+                                print(m.as_json())
+                                current_media = m
+                                current_media.station_id = polyindex.number
+                                eventName = current_media.eventName
+                                current_media.eventName = eventName.replace("station"+str(stations[i].number),"station"+str(polyindex.number))
+                                nextEventName = current_media.nextEventName
+                                if(nextEventName!=None):
+                                    current_media.nextEventName = nextEventName.replace("station"+str(stations[i].number),"station"+str(polyindex.number))
+                                current_media.save()
+                            except ValidationError as e:
+                                print(e.args())
+                        
+        except ValidationError as e:
+            print("No Media "+e.args())
+            
+        response_data['result'] = 'ok'
+        response_data['message'] = 'Rutten sparades'
+    except ValidationError as e:
+        print(e.args())
+        
+        response_data['result'] = 'failed'
+        response_data['message'] = 'Kunde inte ladda rutt från id'
+   
+    return HttpResponse(json.dumps(response_data), content_type="application/json")
+
 
 #Delete media that has been uploaded
 # @param media_id ID of media
@@ -1097,7 +1601,15 @@ def delete_media(media_id, user_id,route_id,station_id,marker_id):
         if(len(media)==1):
             os.remove(m.filepath)
         m.delete()
-                
+        
+    if(station_id==0 and marker_id==0):
+        resetStartMediaEventNames(route_id,user_id)
+        
+    if(station_id!=0):
+        resetStationEvents_nextEvents(route_id,u,station_id)
+        
+    if(marker_id!=0):    
+        resetMarkerEvents_nextEvents(route_id,u,marker_id)
             
             #===================================================================
             # index=0
@@ -1125,6 +1637,94 @@ def delete_media(media_id, user_id,route_id,station_id,marker_id):
         return True
     else:
         return False
+
+def resetStartMediaEventNames(route_id,user_id):
+    if(route_id!=0):
+        start_media = Media.objects.filter(route_id=route_id,user_id=user_id,mediatype=Media.STARTMEDIA)
+        print(route_id)
+        print(user_id)
+        print(start_media)
+        if(len(start_media)>1):
+            initial_start_media = start_media[0]
+            if(isImageFile(initial_start_media.filename)):
+                    initial_start_media.eventName = "start_Image"+str(1)
+                    initial_start_media.save()
+                    
+                     
+            if(isAudioFile(initial_start_media.filename)):
+                initial_start_media.eventName = "start_Audio"+str(1)
+                initial_start_media.save()
+                     
+            if(isVideoFile(initial_start_media.filename)):
+                    initial_start_media.eventName = "start_Video"+str(1)
+                    initial_start_media.save()    
+             
+             
+            for i in range(1,len(start_media)-1):
+                    #current start media and prev start media
+                    curr_start_media = start_media[i]
+                    prev_start_media = start_media[i-1]
+                    if(isImageFile(curr_start_media.filename)):
+                        curr_start_media.eventName = "start_Image"+str(i+1)
+                        prev_start_media.nextEventName = "start_Image"+str(i+1)
+                        prev_start_media.save()
+                        curr_start_media.save()
+                         
+                    if(isAudioFile(curr_start_media.filename)):
+                        curr_start_media.eventName = "start"+"_Audio"+str(i+1)
+                        prev_start_media.nextEventName = "start"+"_Audio"+str(i+1)
+                        prev_start_media.save()
+                        curr_start_media.save()
+                         
+                    if(isVideoFile(curr_start_media.filename)):
+                        curr_start_media.eventName = "start"+"_Video"+str(i+1)
+                        prev_start_media.nextEventName = "start"+"_Video"+str(i+1)
+                        prev_start_media.save()
+                        curr_start_media.save()
+             
+            curr_start_media = start_media[len(start_media)-1]
+            prev_start_media = start_media[len(start_media)-2]     
+            if(isImageFile(curr_start_media.filename)):
+                    curr_start_media.eventName = "start"+"_Image"+str(len(start_media))
+                    prev_start_media.nextEventName = "start"+"_Image"+str(len(start_media))
+                    curr_start_media.nextEventName = None
+                    prev_start_media.save()
+                    curr_start_media.save()
+                     
+            if(isAudioFile(curr_start_media.filename)):
+                    curr_start_media.eventName = "start"+"_Audio"+str(len(start_media))
+                    prev_start_media.nextEventName = "start"+"_Audio"+str(len(start_media))
+                    curr_start_media.nextEventName = None
+                    prev_start_media.save()
+                    curr_start_media.save()
+                     
+            if(isVideoFile(curr_start_media.filename)):
+                    curr_start_media.eventName = "start"+"_Video"+str(len(start_media))
+                    prev_start_media.nextEventName = "start"+"_Video"+str(len(start_media))
+                    curr_start_media.nextEventName = None
+                    prev_start_media.save()
+                    curr_start_media.save()    
+                     
+            elif(len(start_media)==1):
+                last_start_media = start_media[0] 
+                if(isImageFile(last_start_media.filename)):
+                    last_start_media.eventName = "start"+"_Image"+str(1)
+                    last_start_media.nextEventName= None
+                    last_start_media.save()
+                     
+                if(isAudioFile(last_start_media.filename)):
+                    last_start_media.eventName = "start"+"_Audio"+str(1)
+                    last_start_media.nextEventName= None
+                    last_start_media.save()
+                     
+                if(isVideoFile(last_start_media.filename)):
+                    last_start_media.eventName = "start"+"_Video"+str(1)
+                    last_start_media.nextEventName= None
+                    last_start_media.save()
+
+            
+        
+        
 
 def resetMarkerEvents_nextEvents(route_id,u,marker_id):
     if(marker_id!=0):
@@ -1188,16 +1788,96 @@ def resetMarkerEvents_nextEvents(route_id,u,marker_id):
             elif(len(markers)==1):
                 if(isImageFile(markers[0].filename)):
                     markers[0].eventName = "marker"+str(marker_id)+"_Image"+str(1)
+                    markers[0].nextEventName= None
                     markers[0].save()
                     
                 if(isAudioFile(markers[0].filename)):
                     markers[0].eventName = "marker"+str(marker_id)+"_Audio"+str(1)
+                    markers[0].nextEventName= None
                     markers[0].save()
                     
                 if(isVideoFile(markers[0].filename)):
                     markers[0].eventName = "marker"+str(marker_id)+"_Video"+str(1)
+                    markers[0].nextEventName= None
                     markers[0].save()
     
+def resetStationEvents_nextEvents(route_id,u,station_id):
+    if(station_id!=0):
+            stations = Station.objects.filter(route_id =route_id,id = station_id) 
+            station_media = Media.objects.filter(station=stations[0],user=u)
+            station_index = stations[0].number
+            if(len(station_media)>1):
+                if(isImageFile(station_media[0].filename)):
+                    station_media[0].eventName = "station"+str(station_index)+"_Image"+str(1)
+                    station_media[0].save()
+                    
+                if(isAudioFile(station_media[0].filename)):
+                    station_media[0].eventName = "station"+str(station_index)+"_Audio"+str(1)
+                    station_media[0].save()
+                    
+                if(isVideoFile(station_media[0].filename)):
+                    station_media[0].eventName = "station"+str(station_index)+"_Video"+str(1)
+                    station_media[0].save()    
+            
+            
+                for i in range(1,len(station_media)-1):
+                    if(isImageFile(station_media[i].filename)):
+                        station_media[i].eventName = "station"+str(station_index)+"_Image"+str(i+1)
+                        station_media[i-1].nextEventName = "station"+str(station_index)+"_Image"+str(i+1)
+                        station_media[i-1].save()
+                        station_media[i].save()
+                        
+                    if(isAudioFile(station_media[i].filename)):
+                        station_media[i].eventName = "station"+str(station_index)+"_Audio"+str(i+1)
+                        station_media[i-1].nextEventName = "station"+str(station_index)+"_Audio"+str(i+1)
+                        station_media[i-1].save()
+                        station_media[i].save()
+                        
+                    if(isVideoFile(station_media[i].filename)):
+                        station_media[i].eventName = "station"+str(station_index)+"_Video"+str(i+1)
+                        station_media[i-1].nextEventName = "station"+str(station_index)+"_Video"+str(i+1)
+                        station_media[i-1].save()
+                        station_media[i].save()
+            
+                    
+                if(isImageFile(station_media[len(station_media)-1].filename)):
+                    station_media[len(station_media)-1].eventName = "station"+str(station_index)+"_Image"+str(len(station_media))
+                    station_media[len(station_media)-2].nextEventName = "station"+str(station_index)+"_Image"+str(len(station_media))
+                    station_media[len(station_media)-1].nextEventName = None
+                    station_media[len(station_media)-2].save()
+                    station_media[len(station_media)-1].save()
+                    
+                if(isAudioFile(station_media[len(station_media)-1].filename)):
+                    station_media[len(station_media)-1].eventName = "station"+str(station_index)+"_Audio"+str(len(station_media))
+                    station_media[len(station_media)-2].nextEventName = "station"+str(station_index)+"_Audio"+str(len(station_media))
+                    station_media[len(station_media)-1].nextEventName = None
+                    station_media[len(station_media)-2].save()
+                    station_media[len(station_media)-1].save()
+                    
+                if(isVideoFile(station_media[len(station_media)-1].filename)):
+                    station_media[len(station_media)-1].eventName = "station"+str(station_index)+"_Video"+str(len(station_media))
+                    station_media[len(station_media)-2].nextEventName = "station"+str(station_index)+"_Video"+str(len(station_media))
+                    station_media[len(station_media)-1].nextEventName = None
+                    station_media[len(station_media)-2].save()
+                    station_media[len(station_media)-1].save()    
+                    
+            elif(len(station_media)==1):
+                if(isImageFile(station_media[0].filename)):
+                    station_media[0].eventName = "station"+str(station_index)+"_Image"+str(1)
+                    station_media[0].nextEventName= None
+                    station_media[0].save()
+                    
+                if(isAudioFile(station_media[0].filename)):
+                    station_media[0].eventName = "station"+str(station_index)+"_Audio"+str(1)
+                    station_media[0].nextEventName= None
+                    station_media[0].save()
+                    
+                if(isVideoFile(station_media[0].filename)):
+                    station_media[0].eventName = "station"+str(station_index)+"_Video"+str(1)
+                    station_media[0].nextEventName= None
+                    station_media[0].save()
+    
+
 
 
 #Check if route exist or you own it

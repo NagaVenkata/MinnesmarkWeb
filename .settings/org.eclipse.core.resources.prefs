@@ -1,12 +1,17 @@
 eclipse.preferences.version=1
 encoding//editor/views.py=utf-8
+encoding//templates/admin/approve.html=UTF-8
 encoding//templates/editor/addMedia.html=UTF-8
 encoding//templates/editor/editor.html=UTF-8
 encoding//templates/editor/editormenu.html=UTF-8
 encoding//templates/editor/general.html=UTF-8
+encoding//templates/editor/headline.html=UTF-8
 encoding//templates/editor/markerMediaPage.html=UTF-8
 encoding//templates/editor/media.html=UTF-8
 encoding//templates/editor/norouteselected.html=UTF-8
 encoding//templates/editor/publish.html=UTF-8
 encoding//templates/editor/route_menu.html=UTF-8
+encoding//templates/registration/login.html=UTF-8
+encoding//templates/registration/registration_complete.html=UTF-8
+encoding//templates/registration/registration_form.html=UTF-8
 encoding/<project>=UTF-8
